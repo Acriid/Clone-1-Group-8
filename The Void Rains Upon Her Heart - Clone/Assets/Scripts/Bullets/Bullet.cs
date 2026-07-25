@@ -23,9 +23,15 @@ public class Bullet : MonoBehaviour
         //If your code needs the bullet to despawn after it hits something 
         // call OnBulletRemoved?.Invoke(this);
         // and StopDespawnRoutine();
+        Debug.Log($"Hit {collision.collider.name}");
         if(_bulletSO.BouncyBullet && collision.collider.CompareTag("MapEdge"))
         {
             //TODO - Code the bullet bounce
+        }
+        else if (collision.collider.CompareTag("MapEdge"))
+        {
+            StopDespawnRoutine();
+            OnBulletRemoved?.Invoke(this);
         }
         else if(_bulletSO.BossBullet && collision.collider.CompareTag("Boss"))
         {
@@ -79,5 +85,7 @@ public class Bullet : MonoBehaviour
             Debug.LogWarning("StopDespawnRoutine called when _despawnRoutine is null");
             return;
         }
+        StopCoroutine(_despawnRoutine);
+        _despawnRoutine = null;
     }
 }
