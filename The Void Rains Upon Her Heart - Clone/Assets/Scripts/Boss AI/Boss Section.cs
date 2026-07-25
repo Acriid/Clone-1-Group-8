@@ -17,7 +17,7 @@ public class BossSection : MonoBehaviour
     private bool _sectionDestroyed = false;
 
     public event Action<float> OnBossDamage;
-    public event Action OnFinishedMove;
+    public event Action<BossSection> OnFinishedMove;
     
 
 
@@ -70,6 +70,61 @@ public class BossSection : MonoBehaviour
         _moveRoutine = StartCoroutine(MoveSectionEnumerator(movePosition));
 
     }
+    public void MoveSection(Vector2 movePosition, float timeToMove)
+    {
+        if(_moveRoutine != null)
+        {
+            StopCoroutine(_moveRoutine);
+            _moveRoutine = null;
+        }
+
+        _moveRoutine = StartCoroutine(MoveSectionEnumerator(movePosition,timeToMove));
+
+    }
+
+    private IEnumerator MoveSectionEnumerator(Vector2 movePosition)
+    {
+        float stoppingDistance = 0.001f;
+
+        while (Vector2.Distance(transform.position, movePosition) > stoppingDistance)
+        {
+            transform.position = Vector2.MoveTowards(
+                transform.position,
+                movePosition,
+                _sectionSpeed * Time.deltaTime);
+
+            yield return null;
+        }
+
+        transform.position = movePosition;
+        OnFinishedMove?.Invoke(this);
+    }
+
+    private IEnumerator MoveSectionEnumerator(Vector2 movePosition, float moveTime)
+    {
+        Vector2 startPosition = transform.position;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < moveTime)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsedTime / moveTime);
+
+            transform.position = Vector2.Lerp(
+                startPosition,
+                movePosition,
+                t);
+
+            yield return null;
+        }
+
+        transform.position = movePosition;
+        OnFinishedMove?.Invoke(this);
+    }
+
+
+
     public void MoveSinWave()
     {
         if(_sinRoutine != null)
@@ -86,6 +141,23 @@ public class BossSection : MonoBehaviour
             _sinBulletRoutine = StartCoroutine(ShootBullets(_shotSpeed,Vector2.left));
         }      
     }
+
+    private IEnumerator MoveSinWaveEnumerator()
+    {
+        while (true)
+        {
+            float movementOffset = -Mathf.Sin(Time.time * _sectionSpeed + _phaseOffset) * _movementDistance;
+
+            transform.position = _startPosition + Vector2.up * movementOffset;
+
+
+
+            yield return null;
+        }
+    }
+
+
+
     private IEnumerator ShootBullets(float shootSpeed, Vector2 shootDirection)
     {
         WaitForSeconds waitTime = new(shootSpeed);
@@ -99,36 +171,9 @@ public class BossSection : MonoBehaviour
     {
         _bulletManager.ShootBullet(transform.position,Vector2.left);
     }
-    private IEnumerator MoveSinWaveEnumerator()
-    {
-        while (true)
-        {
-            float movementOffset = Mathf.Sin(Time.time * _sectionSpeed + _phaseOffset) * _movementDistance;
-
-            transform.position = _startPosition + Vector2.up * movementOffset;
 
 
 
-            yield return null;
-        }
-    }
-    private IEnumerator MoveSectionEnumerator(Vector2 movePosition)
-    {
-        float stoppingDistance = 0.001f;
-
-        while (Vector2.Distance(transform.position, movePosition) > stoppingDistance)
-        {
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                movePosition,
-                _sectionSpeed * Time.deltaTime);
-
-            yield return null;
-        }
-
-        transform.position = movePosition;
-        OnFinishedMove?.Invoke();
-    }
     private void DisplayTime(DateTime timeToDisplay)
     {
         int hour = timeToDisplay.Hour;
@@ -137,11 +182,6 @@ public class BossSection : MonoBehaviour
         int milliseconds = timeToDisplay.Millisecond;
 
         Debug.Log($"Current Time: {hour}:{minute}:{second}:{milliseconds}");         
-    }
-
-    public void ShootBullet(Vector2 spawnPoint, Vector2 bulletDirection)
-    {
-        _bulletManager.ShootBullet(spawnPoint,bulletDirection);
     }
 
 }
