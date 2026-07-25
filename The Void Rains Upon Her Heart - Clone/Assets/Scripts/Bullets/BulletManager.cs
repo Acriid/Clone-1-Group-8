@@ -14,7 +14,7 @@ public class BulletManager : MonoBehaviour
     private List<Bullet> _activeBullets;
     void Awake()
     {
-        _bulletPool = PoolManager.Instance.GetPool<Bullet>(_bullet, _bulletPoolSize);
+        _bulletPool = PoolManager.Instance.GetPool<Bullet>(_bullet,true, _bulletPoolSize);
         if(_bulletPool == null)
         {
             Debug.LogError("Failed to load bullet pool.");
@@ -43,6 +43,7 @@ public class BulletManager : MonoBehaviour
     //Removes bullet after it has hit something or reached the end of its lifetime
     private void ReturnBullet(Bullet bulletToReturn)
     {
+        Debug.Log("Returned Bullet");
         //UnSubscribe event
         bulletToReturn.OnBulletRemoved -= ReturnBullet;
         

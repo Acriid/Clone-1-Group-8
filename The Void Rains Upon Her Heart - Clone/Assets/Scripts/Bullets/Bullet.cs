@@ -13,6 +13,11 @@ public class Bullet : MonoBehaviour
     //Event that needs to get called to despawn the bullet
     public event Action<Bullet> OnBulletRemoved;
     const int BULLETSPEEDOFFSET = 100;
+    private WaitForSeconds _bulletDespawnWaitTime;
+    void Awake()
+    {
+        _bulletDespawnWaitTime = new WaitForSeconds(_bulletSO.BulletLifetime);
+    }
     void OnCollisionEnter2D(Collision2D collision)
     {
         //If your code needs the bullet to despawn after it hits something 
@@ -62,7 +67,8 @@ public class Bullet : MonoBehaviour
     }
     private IEnumerator DespawnBullet()
     {
-        yield return new WaitForSeconds(_bulletSO.BulletLifetime);
+        yield return _bulletDespawnWaitTime;
+        _despawnRoutine = null;
         OnBulletRemoved?.Invoke(this);
     }
 

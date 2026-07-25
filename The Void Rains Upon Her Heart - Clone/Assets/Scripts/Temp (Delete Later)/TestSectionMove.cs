@@ -3,11 +3,11 @@ using System;
 
 public class TestSectionMove : MonoBehaviour
 {
-    public BossSection BossSection;
+    public BossBrain BossBrain;
 
     void Awake()
     {
+        BossBrain.StartSinAttack();
         
-        BossSection.MoveSinWave();
     }
 }

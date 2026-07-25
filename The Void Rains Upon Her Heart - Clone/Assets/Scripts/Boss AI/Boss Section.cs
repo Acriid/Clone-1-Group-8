@@ -8,6 +8,7 @@ public class BossSection : MonoBehaviour
 
     [SerializeField] private BulletManager _bulletManager;
     [SerializeField] private float _sectionSpeed = 1f;
+    [SerializeField] private float _shotSpeed = 0.2f;
 
     [SerializeField] private float _movementDistance = 2f;
     [SerializeField] private float _phaseOffset = 0f;
@@ -24,6 +25,7 @@ public class BossSection : MonoBehaviour
 
     private Coroutine _moveRoutine = null;
     private Coroutine _sinRoutine = null;
+    private Coroutine _sinBulletRoutine = null;
     public void Damage(float damage)
     {
         if(_sectionDestroyed)
@@ -72,14 +74,30 @@ public class BossSection : MonoBehaviour
     {
         if(_sinRoutine != null)
         {
+            StopCoroutine(_sinBulletRoutine);
             StopCoroutine(_sinRoutine);
             _sinRoutine = null;
+            _sinBulletRoutine = null;
         }
         else
         {
             _startPosition = transform.position;
             _sinRoutine = StartCoroutine(MoveSinWaveEnumerator());
+            _sinBulletRoutine = StartCoroutine(ShootBullets(_shotSpeed,Vector2.left));
         }      
+    }
+    private IEnumerator ShootBullets(float shootSpeed, Vector2 shootDirection)
+    {
+        WaitForSeconds waitTime = new(shootSpeed);
+        while(true)
+        {
+            ShootBullet(shootDirection);
+            yield return waitTime;
+        }
+    }
+    private void ShootBullet(Vector2 bulletDirection)
+    {
+        _bulletManager.ShootBullet(transform.position,Vector2.left);
     }
     private IEnumerator MoveSinWaveEnumerator()
     {
@@ -88,6 +106,8 @@ public class BossSection : MonoBehaviour
             float movementOffset = Mathf.Sin(Time.time * _sectionSpeed + _phaseOffset) * _movementDistance;
 
             transform.position = _startPosition + Vector2.up * movementOffset;
+
+
 
             yield return null;
         }

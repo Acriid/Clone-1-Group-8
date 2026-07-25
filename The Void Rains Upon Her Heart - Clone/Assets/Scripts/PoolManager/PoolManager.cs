@@ -43,6 +43,23 @@ public class PoolManager : MonoBehaviour
         return (GenericPool<T>)poolObj;
     }
 
+    public GenericPool<T> GetPool<T>(GameObject prefab, bool newPool, int initialSize = 5) where T : Component
+    {
+        Type type = typeof(T);
+        _pools.TryGetValue(type, out object poolObj);
+        if(newPool)
+        {
+            Transform poolParent = new GameObject($"{type.Name}_Pool").transform;
+            poolParent.SetParent(_poolRoot);
+
+            var pool = new GenericPool<T>(prefab,poolParent,initialSize);
+            _pools[type] = pool;
+            
+            return pool;
+        }
+        return (GenericPool<T>)poolObj;
+    }
+
     public T Get<T>(GameObject prefab) where T : Component
     {
         return GetPool<T>(prefab).Get();
