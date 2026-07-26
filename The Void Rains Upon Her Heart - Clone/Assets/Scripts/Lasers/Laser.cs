@@ -1,12 +1,15 @@
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using System;
 
 public class Laser : MonoBehaviour
 {
     [SerializeField] private LaserSO _laserSO;
     [SerializeField] private LineRenderer _laserLine;
-    const float LASERLENGTH = 20f;
+
+    public event Action OnLaserFinished;
+    const float LASERLENGTH = 150f;
     //Laser Settings
     private Vector2 _laserSize;
     private Vector2 _laserStartPosition;
@@ -82,11 +85,21 @@ public class Laser : MonoBehaviour
             yield return null;
         }
 
+        OnLaserFinished?.Invoke();
         _laserLine.enabled = false;
     }
     private void SetLaserPosition()
     {
         _laserLine.SetPosition(0,_laserStartPosition);
         _laserLine.SetPosition(1,_laserEndPosition);  
+    }
+    public void ChangeLaserColour(Color newColour)
+    {
+        _laserLine.startColor = newColour;
+        _laserLine.endColor = newColour;
+    }
+    public void SetLaserSO(LaserSO newLaserSO)
+    {
+        _laserSO = newLaserSO;
     }
 }

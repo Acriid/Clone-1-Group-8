@@ -12,12 +12,14 @@ public class BossSection : MonoBehaviour
 
     [SerializeField] private float _movementDistance = 2f;
     [SerializeField] private float _phaseOffset = 0f;
+    [SerializeField] private Laser _laser;
 
     private float _sectionHealth = 400;
     private bool _sectionDestroyed = false;
 
     public event Action<float> OnBossDamage;
     public event Action<BossSection> OnFinishedMove;
+    public event Action<BossSection> OnLaserFinished;
     
 
 
@@ -51,7 +53,11 @@ public class BossSection : MonoBehaviour
     }
     private void Awake()
     {
-        
+        _laser.OnLaserFinished += FinishedLaserShot;
+    }
+    private void OnDisable()
+    {
+        _laser.OnLaserFinished -= FinishedLaserShot;
     }
 
     private void Update()
@@ -144,14 +150,16 @@ public class BossSection : MonoBehaviour
 
     private IEnumerator MoveSinWaveEnumerator()
     {
+
+        float timeTracker = 0f;
         while (true)
         {
-            float movementOffset = -Mathf.Sin(Time.time * _sectionSpeed + _phaseOffset) * _movementDistance;
+            float movementOffset = -Mathf.Sin(timeTracker * _sectionSpeed + _phaseOffset) * _movementDistance;
 
             transform.position = _startPosition + Vector2.up * movementOffset;
 
 
-
+            timeTracker += Time.deltaTime;
             yield return null;
         }
     }
@@ -172,6 +180,18 @@ public class BossSection : MonoBehaviour
         _bulletManager.ShootBullet(transform.position,Vector2.left);
     }
 
+    public void ShootLaser()
+    {
+        _laser.ShootLaser(transform);
+    }
+    public void SetLaserSO(LaserSO newLaserSO)
+    {
+        _laser.SetLaserSO(newLaserSO);
+    }
+    private void FinishedLaserShot()
+    {
+        OnLaserFinished?.Invoke(this);
+    }
 
 
     private void DisplayTime(DateTime timeToDisplay)

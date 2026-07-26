@@ -15,15 +15,21 @@ public class TestSectionMove : MonoBehaviour
 
     void Awake()
     {
-        BossBrain.StartSinAttack();
-        TestLaser.ShootLaser(transform);
+        //BossBrain.StartSinAttack();
+
+
+        //_startPosition = transform.position;
+        //TestLaser.ShootLaser(transform);
+        
+
+        //BossBrain.StartXLaserAttack();
 
         QualitySettings.vSyncCount = 0;
 
         
         Application.targetFrameRate = 60;
 
-        _startPosition = transform.position;
+        
     }
 
     void Update()

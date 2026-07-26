@@ -37,14 +37,11 @@ public class BulletManager : MonoBehaviour
         //Subscribe event
         instance.OnBulletRemoved += ReturnBullet;
         instance.Shoot(spawnPoint,bulletDirection);
-
-        Debug.Log("Shot Bullet");
     }
 
     //Removes bullet after it has hit something or reached the end of its lifetime
     private void ReturnBullet(Bullet bulletToReturn)
     {
-        Debug.Log("Returned Bullet");
         //UnSubscribe event
         bulletToReturn.OnBulletRemoved -= ReturnBullet;
         

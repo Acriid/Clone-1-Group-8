@@ -23,7 +23,6 @@ public class Bullet : MonoBehaviour
         //If your code needs the bullet to despawn after it hits something 
         // call OnBulletRemoved?.Invoke(this);
         // and StopDespawnRoutine();
-        Debug.Log($"Hit {collision.collider.name}");
         if(_bulletSO.BouncyBullet && collision.collider.CompareTag("MapEdge"))
         {
             //TODO - Code the bullet bounce

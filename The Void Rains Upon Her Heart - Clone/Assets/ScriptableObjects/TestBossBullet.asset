@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BulletSO
   BulletSpeed: 5
   BulletDamage: 0
-  BulletLifetime: 3
+  BulletLifetime: 7
   BouncyBullet: 0
   BossBullet: 0
