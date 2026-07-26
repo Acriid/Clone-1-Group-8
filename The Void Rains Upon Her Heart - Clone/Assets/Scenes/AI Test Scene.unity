@@ -183,16 +183,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossBrain
   _arenaBounds:
-    m_Position: {x: -25, y: -15, z: 0}
-    m_Size: {x: 50, y: 30, z: 0}
+    m_Position: {x: -24, y: -14, z: 0}
+    m_Size: {x: 48, y: 28, z: 0}
   _sectionList:
   - {fileID: 1278032023}
   - {fileID: 267718533}
   - {fileID: 587785388}
   - {fileID: 787718561}
-  _attackDelay: 2
-  _sinWaveX: 15
-  _sinWaveYOffset: 6
+  _attackDelay: 3
+  _timeToMoveToAttackPosition: 2
   _sinWaveAttackTime: 6
 --- !u!1 &207269329
 GameObject:
@@ -367,10 +366,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 267718536}
-  _sectionSpeed: 2
+  _sectionSpeed: 3
   _shotSpeed: 0.1
-  _movementDistance: 4
-  _phaseOffset: 0
+  _movementDistance: 2
   _laser: {fileID: 267718538}
 --- !u!212 &267718534
 SpriteRenderer:
@@ -442,7 +440,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.8999996, y: 5.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -460,7 +458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
   _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
-  _bulletPoolSize: 50
+  _bulletPoolSize: 100
 --- !u!120 &267718537
 LineRenderer:
   serializedVersion: 3
@@ -665,10 +663,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 587785391}
-  _sectionSpeed: 2
+  _sectionSpeed: 3
   _shotSpeed: 0.1
-  _movementDistance: 4
-  _phaseOffset: 0
+  _movementDistance: 2
   _laser: {fileID: 587785393}
 --- !u!212 &587785389
 SpriteRenderer:
@@ -740,7 +737,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.8999996, y: -0.6999998, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -758,7 +755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
   _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
-  _bulletPoolSize: 50
+  _bulletPoolSize: 100
 --- !u!120 &587785392
 LineRenderer:
   serializedVersion: 3
@@ -1048,7 +1045,7 @@ Transform:
   m_GameObject: {fileID: 588681019}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25.6, y: -14.6, z: 0}
+  m_LocalPosition: {x: 24, y: -14.2, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1088,10 +1085,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 787718564}
-  _sectionSpeed: 2
+  _sectionSpeed: 3
   _shotSpeed: 0.1
-  _movementDistance: 4
-  _phaseOffset: 0
+  _movementDistance: 2
   _laser: {fileID: 787718566}
 --- !u!212 &787718562
 SpriteRenderer:
@@ -1163,7 +1159,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.8999996, y: -6.7, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1181,7 +1177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
   _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
-  _bulletPoolSize: 50
+  _bulletPoolSize: 100
 --- !u!120 &787718565
 LineRenderer:
   serializedVersion: 3
@@ -1368,7 +1364,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 15
+  orthographic size: 14
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1477,10 +1473,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 1278032026}
-  _sectionSpeed: 2
+  _sectionSpeed: 3
   _shotSpeed: 0.1
-  _movementDistance: 4
-  _phaseOffset: 0
+  _movementDistance: 2
   _laser: {fileID: 1278032028}
 --- !u!212 &1278032024
 SpriteRenderer:
@@ -1552,7 +1547,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.9, y: 11.3, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1570,7 +1565,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
   _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
-  _bulletPoolSize: 50
+  _bulletPoolSize: 100
 --- !u!120 &1278032027
 LineRenderer:
   serializedVersion: 3

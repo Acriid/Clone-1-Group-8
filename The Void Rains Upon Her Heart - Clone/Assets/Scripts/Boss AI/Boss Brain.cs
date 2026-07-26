@@ -13,13 +13,11 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private List<BossSection> _sectionList = new(4);
     [Header("General Attacks")]
     [SerializeField] private float _attackDelay = 2f;
+    [SerializeField] private float _timeToMoveToAttackPosition = 2f;
     [Header("SinWave Attack")]
-    [SerializeField] private float _sinWaveX = 10f;
-    [SerializeField] private float _sinWaveYOffset = 4f;
     [SerializeField] private float _sinWaveAttackTime = 6.5f;
-    [Header("XLaser Attack")]
-
-
+    [Header("SpinningBullet Attack")]
+    [SerializeField] private float _spinningBulletTime = 3f;
 
     private List<BossSection> _section1 = new(2);
     private List<BossSection> _section2 = new(2);
@@ -47,6 +45,7 @@ public class BossBrain : MonoBehaviour
 
 
     //Laser attacks will always aim at the other side of the screen past the middle.
+    //2/3 for x 1/2 for y all from the centre
     private int _previousAttack = -1;
     private event Action _onAttackDone;
     void Start()
@@ -80,33 +79,187 @@ public class BossBrain : MonoBehaviour
     private void SendPhase1Attack()
     {
         ResetSection();
-        int randomAttack = Random.Range(0,2);
+        int randomAttack = Random.Range(0,4);
         while(randomAttack == _previousAttack)
         {
-            randomAttack = Random.Range(0,2);
+            randomAttack = Random.Range(0,4);
         }
 
         if(randomAttack == 0)
         {
             StartSinAttack();
+
         }
         else if(randomAttack == 1)
         {
             StartXLaserAttack();
+
+        }
+        else if(randomAttack == 2)
+        {
+            StartLineLaserAttack();
+        }
+        else if(randomAttack == 3)
+        {
+            StartSpinningBulletAttack();
+        }
+    }
+    private void StartSpinningBulletAttack()
+    {
+
+        PutIntoSections();
+        float yPosition = _arenaBounds.yMax / 2;
+        float xPosition = _arenaBounds.xMin * 2/3;
+        float rotationOffset = 30f;
+        Vector2 sectionPosition = new(xPosition, yPosition);
+        Vector2 sectionRotation = Quaternion.Euler(0,0,rotationOffset) * Vector2.down;
+
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanSpinningBulletAttack;
+
+
+            bossSection.transform.up = sectionRotation;
+            sectionRotation = Quaternion.Euler(0,0,-rotationOffset) * Vector2.right;
+
+            sectionPosition.y *= -1;
+        }
+
+        sectionRotation = Quaternion.Euler(0,0,-rotationOffset) * Vector2.left;
+
+        sectionPosition.x *= -1;
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanSpinningBulletAttack;
+
+
+            bossSection.transform.up = sectionRotation;
+            sectionRotation = Quaternion.Euler(0,0,rotationOffset) * Vector2.up;
+
+
+            sectionPosition.y *= -1;
         }
     }
 
-    public void StartXLaserAttack()
+    private void CheckIfCanSpinningBulletAttack(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CheckIfCanSpinningBulletAttack;
+        _sectionsFinishedMoving[_sectionList.IndexOf(bossSection)] = true;
+
+        //Check if all finished moving
+        foreach(bool booleans in _sectionsFinishedMoving)
+        {
+            if(!booleans) return;
+        }
+
+        //Reset Movement
+        for(int i = 0; i < _sectionsFinishedMoving.Count ; i++)
+        {
+            _sectionsFinishedMoving[i] = false;
+        }
+
+        StartCoroutine(SpinningBulletAttack());
+    }
+
+    private IEnumerator SpinningBulletAttack()
+    {
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.RotateAndShoot(0.5f,40f);
+        }
+        yield return new WaitForSeconds(_spinningBulletTime);
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.RotateAndShoot();
+        }
+
+        _previousAttack = 3;
+        _onAttackDone?.Invoke();
+    }
+
+    private void StartLineLaserAttack()
+    {
+        float yOffset = 2 *_arenaBounds.yMax / 5;
+        float xPosition = _arenaBounds.xMax * 96/100;
+        Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset);
+
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.MoveSection(movePosition,_timeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanLineLaserAttack;
+            bossSection.transform.up = Vector2.left;
+            movePosition.y -= yOffset;
+        }        
+    }
+    private void CheckIfCanLineLaserAttack(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CheckIfCanLineLaserAttack;
+        _sectionsFinishedMoving[_sectionList.IndexOf(bossSection)] = true;
+
+        //Check if all finished moving
+        foreach(bool booleans in _sectionsFinishedMoving)
+        {
+            if(!booleans) return;
+        }
+
+        //Reset Movement
+        for(int i = 0; i < _sectionsFinishedMoving.Count ; i++)
+        {
+            _sectionsFinishedMoving[i] = false;
+        }
+
+        LineLaserAttack();
+    }
+
+    private void LineLaserAttack()
+    {
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.transform.up = (FindLaserPosition(bossSection.transform.position) 
+            - (Vector2)bossSection.transform.position).normalized;
+            bossSection.OnLaserFinished += FinishedLineLaserAttack;
+            bossSection.ShootLaser();
+        }
+
+        
+    }
+
+    private void FinishedLineLaserAttack(BossSection bossSection)
+    {
+        bossSection.OnLaserFinished -= FinishedLineLaserAttack;
+
+        _sectionsFinishedLaser[_sectionList.IndexOf(bossSection)] = true;
+
+        //Check if all finished moving
+        foreach(bool booleans in _sectionsFinishedLaser)
+        {
+            if(!booleans) return;
+        }
+
+        //Reset Movement
+        for(int i = 0; i < _sectionsFinishedLaser.Count ; i++)
+        {
+            _sectionsFinishedLaser[i] = false;
+        }
+
+        _previousAttack = 2;
+        _onAttackDone?.Invoke();
+    }
+
+    private void StartXLaserAttack()
     {
         PutIntoSections();
-        float xPosition = _arenaBounds.xMin * 95/100;
-        float yPosition = _arenaBounds.yMax * 95/100;
+        float xPosition = _arenaBounds.xMin * 96/100;
+        float yPosition = _arenaBounds.yMax * 96/100;
         Vector2 sectionPosition = new(xPosition,yPosition);
         
         foreach(BossSection bossSection in _section1)
         {
-            bossSection.MoveSection(sectionPosition,2f);
+            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanXLaserAttack;
+            bossSection.transform.up = Vector2.right;
             sectionPosition.y *= -1;
         }
 
@@ -114,8 +267,9 @@ public class BossBrain : MonoBehaviour
         sectionPosition.y = yPosition / 4f;
         foreach(BossSection bossSection in _section2)
         {
-            bossSection.MoveSection(sectionPosition,2f);
+            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanXLaserAttack;
+            bossSection.transform.up = Vector2.left;
             sectionPosition.y *= -1;
         }
     }
@@ -171,16 +325,17 @@ public class BossBrain : MonoBehaviour
         _previousAttack = 1;
         _onAttackDone?.Invoke();
     }
-    public void StartSinAttack()
+    private void StartSinAttack()
     {
-        float yOffset = _sinWaveYOffset;
-        Vector2 movePosition = new(_arenaBounds.xMax - 5, 2f* yOffset);
-
+        float yOffset = 2 *_arenaBounds.yMax / 5;
+        float xPosition = _arenaBounds.xMax * 96/100;
+        Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset);
 
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSection(movePosition,1f);
+            bossSection.MoveSection(movePosition,_timeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanSinAttack;
+            bossSection.transform.up = Vector2.left;
             movePosition.y -= yOffset;
         }
     }
@@ -201,11 +356,10 @@ public class BossBrain : MonoBehaviour
             _sectionsFinishedMoving[i] = false;
         }
 
-        StartCoroutine(SinWaveAttack(_attackDelay));
+        StartCoroutine(SinWaveAttack());
     }
-    private IEnumerator SinWaveAttack(float waitTime)
+    private IEnumerator SinWaveAttack()
     {
-        yield return new WaitForSeconds(waitTime);
         foreach(BossSection bossSection in _sectionList)
         {
             bossSection.MoveSinWave();

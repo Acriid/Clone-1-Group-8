@@ -11,7 +11,6 @@ public class BossSection : MonoBehaviour
     [SerializeField] private float _shotSpeed = 0.2f;
 
     [SerializeField] private float _movementDistance = 2f;
-    [SerializeField] private float _phaseOffset = 0f;
     [SerializeField] private Laser _laser;
 
     private float _sectionHealth = 400;
@@ -28,6 +27,7 @@ public class BossSection : MonoBehaviour
     private Coroutine _moveRoutine = null;
     private Coroutine _sinRoutine = null;
     private Coroutine _sinBulletRoutine = null;
+    private Coroutine _rotateRoutine = null;
     public void Damage(float damage)
     {
         if(_sectionDestroyed)
@@ -129,7 +129,36 @@ public class BossSection : MonoBehaviour
         OnFinishedMove?.Invoke(this);
     }
 
+    public void RotateAndShoot(float shootInterval,float rotateSpeed)
+    {
+        _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotateSpeed));
 
+    }
+
+    public void RotateAndShoot()
+    {
+        if(_rotateRoutine != null)
+        {
+            StopCoroutine(_rotateRoutine);
+            _rotateRoutine = null;
+        }
+    }
+
+    private IEnumerator RotateOverTime(float shootInterval,float rotateSpeed)
+    {
+        float bulletShot = -1f;
+        while(true)
+        {
+            transform.Rotate(0,0,rotateSpeed * Time.deltaTime);
+            if(bulletShot < 0)
+            {
+                ShootBullet(transform.up);
+                bulletShot = shootInterval;
+            }
+            bulletShot -= Time.deltaTime;
+            yield return null;
+        }
+    }
 
     public void MoveSinWave()
     {
@@ -154,7 +183,7 @@ public class BossSection : MonoBehaviour
         float timeTracker = 0f;
         while (true)
         {
-            float movementOffset = -Mathf.Sin(timeTracker * _sectionSpeed + _phaseOffset) * _movementDistance;
+            float movementOffset = -Mathf.Sin(timeTracker * _sectionSpeed) * _movementDistance;
 
             transform.position = _startPosition + Vector2.up * movementOffset;
 
@@ -177,7 +206,7 @@ public class BossSection : MonoBehaviour
     }
     private void ShootBullet(Vector2 bulletDirection)
     {
-        _bulletManager.ShootBullet(transform.position,Vector2.left);
+        _bulletManager.ShootBullet(transform.position,bulletDirection);
     }
 
     public void ShootLaser()

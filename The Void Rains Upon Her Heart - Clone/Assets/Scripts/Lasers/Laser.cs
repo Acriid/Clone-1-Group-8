@@ -75,7 +75,6 @@ public class Laser : MonoBehaviour
             Collider2D hit = Physics2D.OverlapBox(_laserMiddle,_laserSize,_laserAngle,_laserSO.PlayerMask);
             if(hit)
             {
-                Debug.Log("Hit thing");
             }
 
             UpdateLaserPosition();
