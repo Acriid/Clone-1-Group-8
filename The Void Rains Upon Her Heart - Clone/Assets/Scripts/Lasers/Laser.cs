@@ -9,7 +9,7 @@ public class Laser : MonoBehaviour
     [SerializeField] private LineRenderer _laserLine;
 
     public event Action OnLaserFinished;
-    const float LASERLENGTH = 150f;
+    const float LASERLENGTH = 50f;
     //Laser Settings
     private Vector2 _laserSize;
     private Vector2 _laserStartPosition;

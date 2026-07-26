@@ -13,14 +13,16 @@ public class BossSection : MonoBehaviour
     [SerializeField] private float _movementDistance = 2f;
     [SerializeField] private Laser _laser;
 
-    private float _sectionHealth = 400;
+    //Health for lvl 2 per section is 349
+    //Health for lvl 2 for phase 2 is 97 per section
+    private float _sectionHealth = 349;
     private bool _sectionDestroyed = false;
 
     public event Action<float> OnBossDamage;
+    public event Action<BossSection> OnSectionDestroyed;
     public event Action<BossSection> OnFinishedMove;
     public event Action<BossSection> OnLaserFinished;
     
-
 
     private Vector2 _startPosition = new(8f,0f);
 
@@ -32,7 +34,7 @@ public class BossSection : MonoBehaviour
     {
         if(_sectionDestroyed)
         {
-            damage *= 0.1f;
+            damage *= 0f;
         }
         else
         {
@@ -40,12 +42,24 @@ public class BossSection : MonoBehaviour
             if(_sectionHealth <= 0)
             {
                 _sectionDestroyed = true;
+                OnSectionDestroyed?.Invoke(this);
             }
         }
 
         OnBossDamage?.Invoke(damage);
-        
     }
+
+    public void TESTDESTROYSECTION()
+    {
+        _sectionHealth = 0f;
+        _sectionDestroyed = true;
+        OnSectionDestroyed?.Invoke(this);
+    }
+
+
+
+
+
 
     private void DestroySection()
     {

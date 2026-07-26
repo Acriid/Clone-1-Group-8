@@ -9,6 +9,9 @@ public class BossBrain : MonoBehaviour
 {
     [Header("General Settings")]
     [SerializeField] private BoundsInt _arenaBounds;
+    [SerializeField] private LaserSO _phase2LaserSO;
+    [SerializeField] private GameObject _sectionsParent;
+    [SerializeField] private float _sectionsParentRotationSpeed = 40f;
     private BoundsInt _leftArenaBounds;
     [SerializeField] private List<BossSection> _sectionList = new(4);
     [Header("General Attacks")]
@@ -30,6 +33,14 @@ public class BossBrain : MonoBehaviour
     };
 
     private List<bool> _sectionsFinishedLaser = new(4)
+    {
+        false,
+        false,
+        false,
+        false,
+    };
+
+    private List<bool> _sectionsBroken = new(4)
     {
         false,
         false,
@@ -59,11 +70,116 @@ public class BossBrain : MonoBehaviour
 
         _onAttackDone += SendAttack;
         _onAttackDone?.Invoke();
+
+        TestPhase2();
     }
 
     void OnDisable()
     {
         _onAttackDone -= SendAttack;
+    }
+    private void TestPhase2()
+    {
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.TESTDESTROYSECTION();
+            OnSectionBroken(bossSection);
+        }
+    }
+    private void OnSectionBroken(BossSection bossSection)
+    {
+        bossSection.OnSectionDestroyed -= OnSectionBroken;
+        _sectionsBroken[_sectionList.IndexOf(bossSection)] = true;
+
+        //Check if all finished moving
+        foreach(bool booleans in _sectionsBroken)
+        {
+            if(!booleans) return;
+        }
+
+        StopAllCoroutines();
+        _onAttackDone -= SendAttack;
+        StartPhase2();
+    }
+
+    private void StartPhase2()
+    {
+        ResetSection();
+        PutIntoSections();
+
+        float xPosition = 0f;
+        float yPosition = _arenaBounds.center.y + 2;
+
+        Vector2 movePosition = new(xPosition,yPosition);
+        Vector2 sectionRotation = Vector2.up;
+
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.MoveSection(movePosition,3f);
+            bossSection.OnFinishedMove += CanStartPhase2Attacks;
+
+            bossSection.transform.up = sectionRotation;
+            sectionRotation = Vector2.down;
+
+
+            movePosition.y *= -1;
+        }
+
+
+        sectionRotation = Vector2.right;
+
+        xPosition = _arenaBounds.center.x + 2;
+        yPosition = 0f;
+
+        movePosition = new(xPosition,yPosition);
+
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.MoveSection(movePosition,3f);
+            bossSection.OnFinishedMove += CanStartPhase2Attacks;
+
+            bossSection.transform.up = sectionRotation;
+            sectionRotation = Vector2.left;
+
+            movePosition.x *= -1;         
+        }
+    }
+    private void CanStartPhase2Attacks(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CanStartPhase2Attacks;
+        _sectionsFinishedMoving[_sectionList.IndexOf(bossSection)] = true;
+
+        //Check if all finished moving
+        foreach(bool booleans in _sectionsFinishedMoving)
+        {
+            if(!booleans) return;
+        }
+
+        //Reset Movement
+        for(int i = 0; i < _sectionsFinishedMoving.Count ; i++)
+        {
+            _sectionsFinishedMoving[i] = false;
+        }
+
+
+        StartPhase2Attacks();
+        StartCoroutine(RotateSections());
+    }
+    private IEnumerator RotateSections()
+    {
+        while(true)
+        {
+            _sectionsParent.transform.Rotate(0,0,_sectionsParentRotationSpeed*Time.deltaTime);
+            yield return null;
+        }
+    }
+    private void StartPhase2Attacks()
+    {
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.SetLaserSO(_phase2LaserSO);
+            bossSection.ShootLaser();
+        }
     }
     private void SendAttack()
     {
