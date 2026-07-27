@@ -264,7 +264,7 @@ public class BossSection : MonoBehaviour
             yield return waitTime;
         }
     }
-    private void ShootBullet(Vector2 bulletDirection)
+    public void ShootBullet(Vector2 bulletDirection)
     {
         _bulletManager.ShootBullet(transform.position,bulletDirection);
     }
@@ -297,6 +297,10 @@ public class BossSection : MonoBehaviour
             BulletDirection.Right => (Vector2)transform.right,
             _ => (Vector2)transform.up,
         };
+    }
+    public void StopAllRoutines()
+    {
+        StopAllCoroutines();
     }
     private void DisplayTime(DateTime timeToDisplay)
     {

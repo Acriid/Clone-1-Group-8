@@ -81,12 +81,19 @@ public class BossBrain : MonoBehaviour
         _onAttackDone += SendAttack;
         _onAttackDone?.Invoke();
 
-        TestPhase2();
+        //TestPhase2();
+        //StartCoroutine(GoPhase2AfterTime());
     }
 
     void OnDisable()
     {
         _onAttackDone -= SendAttack;
+        _onAttackDone -= SendPhase2Attack;
+    }
+    private IEnumerator GoPhase2AfterTime()
+    {
+        yield return new WaitForSeconds(60f);
+        TestPhase2();
     }
     private void TestPhase2()
     {
@@ -108,8 +115,13 @@ public class BossBrain : MonoBehaviour
         }
 
         StopAllCoroutines();
+        foreach(BossSection bossSection1 in _sectionList)
+        {
+            bossSection1.StopLaser();
+            bossSection1.StopAllRoutines();
+        }
         _onAttackDone -= SendAttack;
-        _onAttackDone += StartPhase2Attacks;
+        _onAttackDone += SendPhase2Attack;
         StartPhase2();
     }
 
@@ -200,16 +212,24 @@ public class BossBrain : MonoBehaviour
             bossSection.SetLaserSO(_phase2LaserSO);
             bossSection.ShootLaser();
         }
-
+        _previousAttack = Random.Range(0,2);
         SendPhase2Attack();
     }
     private void SendPhase2Attack()
     {
-        StartCoroutine(FourBulletAttack(0.1f,2f));
+        StartCoroutine(WaitBeforePhase2Attack());
     }
-    private void WaitBeforePhase2Attack()
+    private IEnumerator WaitBeforePhase2Attack()
     {
-        
+        yield return new WaitForSeconds(_attackDelay);
+        if(_previousAttack == 0)
+        {
+            StartCoroutine(BulletSpreadAttack(1.5f));
+        }
+        else
+        {
+            StartCoroutine(FourBulletAttack(0.1f,2f));
+        }
     }
     private IEnumerator FourBulletAttack(float shotWaitTime,float negativeWaitTime)
     {
@@ -230,6 +250,46 @@ public class BossBrain : MonoBehaviour
                 yield return new WaitForSeconds(negativeWaitTime);
             }
         }
+        _previousAttack = 0;
+        _onAttackDone?.Invoke();
+    }
+    private IEnumerator BulletSpreadAttack(float timeBetweenAttacks)
+    {
+        float degreeToRotate = 360f/7f;
+        float phaseOffset = degreeToRotate/2f;
+        for (int i = 0; i < 4; i++)
+        {
+            Vector2 originalShootDirection = Vector2.right;
+            if (i % 2 == 0)
+            {
+                for(int j = 0 ; j < 7 ; j++)
+                {
+                    _positiveSection.ShootBullet(originalShootDirection);
+                    originalShootDirection = Quaternion.Euler(0f,0f,degreeToRotate) * originalShootDirection;
+                }
+            }
+            else
+            {
+                originalShootDirection = Quaternion.Euler(0f,0f,phaseOffset) * originalShootDirection;
+                for(int j = 0 ; j < 7 ; j++)
+                {
+                    _negativeSection.ShootBullet(originalShootDirection);
+                    originalShootDirection = Quaternion.Euler(0f,0f,degreeToRotate) * originalShootDirection;
+                }
+            }
+
+            if (i < 3)
+            {
+                yield return new WaitForSeconds(timeBetweenAttacks);
+            }    
+        }  
+
+        _previousAttack = 1;
+        _onAttackDone?.Invoke(); 
+    }
+    private IEnumerator SevenBulletsAttack()
+    {
+        yield return null;
     }
     private void SendAttack()
     {
