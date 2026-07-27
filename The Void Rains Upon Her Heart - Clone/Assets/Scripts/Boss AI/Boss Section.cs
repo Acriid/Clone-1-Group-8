@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class BossSection : MonoBehaviour
 
     [SerializeField] private BulletManager _bulletManager;
     [SerializeField] private float _sectionSpeed = 1f;
-    [SerializeField] private float _shotSpeed = 0.2f;
+    
 
     [SerializeField] private float _movementDistance = 2f;
     [SerializeField] private Laser _laser;
@@ -28,8 +29,18 @@ public class BossSection : MonoBehaviour
 
     private Coroutine _moveRoutine = null;
     private Coroutine _sinRoutine = null;
-    private Coroutine _sinBulletRoutine = null;
+    private Coroutine _bulletRoutine = null;
     private Coroutine _rotateRoutine = null;
+
+    private List<Coroutine> _routineList = new(4)
+    {
+        null,
+        null,
+        null,
+        null
+    };
+    #region Damage
+
     public void Damage(float damage)
     {
         if(_sectionDestroyed)
@@ -48,7 +59,8 @@ public class BossSection : MonoBehaviour
 
         OnBossDamage?.Invoke(damage);
     }
-
+    #endregion
+    //DELETE LATER
     public void TESTDESTROYSECTION()
     {
         _sectionHealth = 0f;
@@ -56,29 +68,29 @@ public class BossSection : MonoBehaviour
         OnSectionDestroyed?.Invoke(this);
     }
 
-
-
-
-
-
     private void DestroySection()
     {
         //TODO - implement the sprite change
     }
+
+
+
+
+
+
+    #region UnityFunctions
     private void Awake()
     {
+        if(_laser != null)
         _laser.OnLaserFinished += FinishedLaserShot;
     }
     private void OnDisable()
     {
+        if(_laser != null)
         _laser.OnLaserFinished -= FinishedLaserShot;
     }
-
-    private void Update()
-    {
-
-    }
-
+    #endregion
+    #region Movement
     public void MoveSection(Vector2 movePosition)
     {
         if(_moveRoutine != null)
@@ -142,11 +154,11 @@ public class BossSection : MonoBehaviour
         transform.position = movePosition;
         OnFinishedMove?.Invoke(this);
     }
-
+    #endregion
+    #region Rotation
     public void RotateAndShoot(float shootInterval,float rotateSpeed)
     {
         _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotateSpeed));
-
     }
 
     public void RotateAndShoot()
@@ -163,7 +175,9 @@ public class BossSection : MonoBehaviour
         float bulletShot = -1f;
         while(true)
         {
+
             transform.Rotate(0,0,rotateSpeed * Time.deltaTime);
+
             if(bulletShot < 0)
             {
                 ShootBullet(transform.up);
@@ -173,21 +187,21 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
     }
-
-    public void MoveSinWave()
+    #endregion
+    #region SinWave
+    public void MoveSinWave(float shotSpeed)
     {
         if(_sinRoutine != null)
         {
-            StopCoroutine(_sinBulletRoutine);
+            ShootBullet(shotSpeed,Vector2.left);
             StopCoroutine(_sinRoutine);
             _sinRoutine = null;
-            _sinBulletRoutine = null;
         }
         else
         {
             _startPosition = transform.position;
             _sinRoutine = StartCoroutine(MoveSinWaveEnumerator());
-            _sinBulletRoutine = StartCoroutine(ShootBullets(_shotSpeed,Vector2.left));
+            ShootBullet(shotSpeed,Vector2.left);
         }      
     }
 
@@ -206,9 +220,41 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
     }
+    #endregion
+    #region Shooting Bullets
+    public void ShootBullet(float shotSpeed, Vector2 shootDirection)
+    {
+        if(_bulletRoutine != null)
+        {
+            StopCoroutine(_bulletRoutine);
+            _bulletRoutine = null;
+        }
+        else
+        {
+            _bulletRoutine = StartCoroutine(ShootBullets(shotSpeed,shootDirection));
+        }
+    }
+    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount)
+    {
+        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Up,bulletAmount));
+        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Down,bulletAmount));
+        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Left,bulletAmount));
+        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Right,bulletAmount));
+    }
+    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount)
+    {
+        
+        WaitForSeconds waitTime = new(shotSpeed);
+        int bulletsShot = 0;
 
-
-
+        while (bulletsShot < bulletAmount)
+        {
+            Vector2 dir = GetDirectionVector(direction);
+            ShootBullet(dir);
+            bulletsShot++;
+            yield return waitTime;
+        }
+    }
     private IEnumerator ShootBullets(float shootSpeed, Vector2 shootDirection)
     {
         WaitForSeconds waitTime = new(shootSpeed);
@@ -222,7 +268,8 @@ public class BossSection : MonoBehaviour
     {
         _bulletManager.ShootBullet(transform.position,bulletDirection);
     }
-
+    #endregion
+    #region Laser
     public void ShootLaser()
     {
         _laser.ShootLaser(transform);
@@ -231,12 +278,26 @@ public class BossSection : MonoBehaviour
     {
         _laser.SetLaserSO(newLaserSO);
     }
+    public void StopLaser()
+    {
+        _laser.StopLaser();
+    }
     private void FinishedLaserShot()
     {
         OnLaserFinished?.Invoke(this);
     }
-
-
+    #endregion
+    private Vector2 GetDirectionVector(BulletDirection direction)
+    {
+        return direction switch
+        {
+            BulletDirection.Up => (Vector2)transform.up,
+            BulletDirection.Down => (Vector2)(-transform.up),
+            BulletDirection.Left => (Vector2)(-transform.right),
+            BulletDirection.Right => (Vector2)transform.right,
+            _ => (Vector2)transform.up,
+        };
+    }
     private void DisplayTime(DateTime timeToDisplay)
     {
         int hour = timeToDisplay.Hour;
@@ -248,3 +309,5 @@ public class BossSection : MonoBehaviour
     }
 
 }
+
+public enum BulletDirection { Up, Down, Left, Right }

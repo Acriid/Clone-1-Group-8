@@ -11,7 +11,11 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private BoundsInt _arenaBounds;
     [SerializeField] private LaserSO _phase2LaserSO;
     [SerializeField] private GameObject _sectionsParent;
+    [SerializeField] private BossSection _negativeSection;
+    [SerializeField] private BossSection _positiveSection;
+    
     [SerializeField] private float _sectionsParentRotationSpeed = 40f;
+    [SerializeField] private float _bulletSectionRotationSpeed = 60f;
     private BoundsInt _leftArenaBounds;
     [SerializeField] private List<BossSection> _sectionList = new(4);
     [Header("General Attacks")]
@@ -19,6 +23,7 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private float _timeToMoveToAttackPosition = 2f;
     [Header("SinWave Attack")]
     [SerializeField] private float _sinWaveAttackTime = 6.5f;
+    [SerializeField] private float _sinShotSpeed = 0.2f;
     [Header("SpinningBullet Attack")]
     [SerializeField] private float _spinningBulletTime = 3f;
 
@@ -53,14 +58,19 @@ public class BossBrain : MonoBehaviour
     //LineLaser = 2
     //SpinningBullet = 3
 
-
-
     //Laser attacks will always aim at the other side of the screen past the middle.
     //2/3 for x 1/2 for y all from the centre
+
+    //Phase 2
+    //All attacks happen one after another
+    //FourBullets = 0
+    //BulletSpread = 1
     private int _previousAttack = -1;
     private event Action _onAttackDone;
     void Start()
     {
+
+
         int splitX = _arenaBounds.xMin + _arenaBounds.size.x / 2;
 
        _leftArenaBounds = new BoundsInt(
@@ -99,6 +109,7 @@ public class BossBrain : MonoBehaviour
 
         StopAllCoroutines();
         _onAttackDone -= SendAttack;
+        _onAttackDone += StartPhase2Attacks;
         StartPhase2();
     }
 
@@ -117,6 +128,7 @@ public class BossBrain : MonoBehaviour
         {
             bossSection.MoveSection(movePosition,3f);
             bossSection.OnFinishedMove += CanStartPhase2Attacks;
+            bossSection.OnSectionDestroyed += StopLaser;
 
             bossSection.transform.up = sectionRotation;
             sectionRotation = Vector2.down;
@@ -144,6 +156,11 @@ public class BossBrain : MonoBehaviour
             movePosition.x *= -1;         
         }
     }
+    private void StopLaser(BossSection bossSection)
+    {
+        bossSection.OnSectionDestroyed -= StopLaser;
+        bossSection.StopLaser();
+    }
     private void CanStartPhase2Attacks(BossSection bossSection)
     {
         bossSection.OnFinishedMove -= CanStartPhase2Attacks;
@@ -170,15 +187,48 @@ public class BossBrain : MonoBehaviour
         while(true)
         {
             _sectionsParent.transform.Rotate(0,0,_sectionsParentRotationSpeed*Time.deltaTime);
+            _positiveSection.transform.Rotate(0,0,_bulletSectionRotationSpeed*Time.deltaTime);
+            _negativeSection.transform.Rotate(0,0,-_bulletSectionRotationSpeed*Time.deltaTime);
             yield return null;
         }
     }
     private void StartPhase2Attacks()
     {
+
         foreach(BossSection bossSection in _section1)
         {
             bossSection.SetLaserSO(_phase2LaserSO);
             bossSection.ShootLaser();
+        }
+
+        SendPhase2Attack();
+    }
+    private void SendPhase2Attack()
+    {
+        StartCoroutine(FourBulletAttack(0.1f,2f));
+    }
+    private void WaitBeforePhase2Attack()
+    {
+        
+    }
+    private IEnumerator FourBulletAttack(float shotWaitTime,float negativeWaitTime)
+    {
+        int bulletAmount = 6;
+        for (int i = 0; i < 4; i++)
+        {
+            if (i % 2 == 0)
+            {
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount);
+            }
+            else
+            {
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount);
+            }
+
+            if (i < 3)
+            {
+                yield return new WaitForSeconds(negativeWaitTime);
+            }
         }
     }
     private void SendAttack()
@@ -478,12 +528,12 @@ public class BossBrain : MonoBehaviour
     {
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSinWave();
+            bossSection.MoveSinWave(_sinShotSpeed);
         }
         yield return new WaitForSeconds(_sinWaveAttackTime);
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSinWave();
+            bossSection.MoveSinWave(_sinShotSpeed);
         }
 
         _previousAttack = 0;

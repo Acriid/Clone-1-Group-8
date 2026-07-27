@@ -187,7 +187,10 @@ MonoBehaviour:
     m_Size: {x: 48, y: 28, z: 0}
   _phase2LaserSO: {fileID: 11400000, guid: c48cb2e50dd9b4b45a1d6c47a4acfb1c, type: 2}
   _sectionsParent: {fileID: 1911772270}
+  _negativeSection: {fileID: 1548018183}
+  _positiveSection: {fileID: 1763710633}
   _sectionsParentRotationSpeed: 20
+  _bulletSectionRotationSpeed: 60
   _sectionList:
   - {fileID: 1278032023}
   - {fileID: 267718533}
@@ -196,6 +199,7 @@ MonoBehaviour:
   _attackDelay: 3
   _timeToMoveToAttackPosition: 2
   _sinWaveAttackTime: 6
+  _sinShotSpeed: 0.2
   _spinningBulletTime: 3
 --- !u!1 &207269329
 GameObject:
@@ -371,7 +375,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 267718536}
   _sectionSpeed: 3
-  _shotSpeed: 0.1
   _movementDistance: 2
   _laser: {fileID: 267718538}
 --- !u!212 &267718534
@@ -668,7 +671,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 587785391}
   _sectionSpeed: 3
-  _shotSpeed: 0.1
   _movementDistance: 2
   _laser: {fileID: 587785393}
 --- !u!212 &587785389
@@ -1090,7 +1092,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 787718564}
   _sectionSpeed: 3
-  _shotSpeed: 0.1
   _movementDistance: 2
   _laser: {fileID: 787718566}
 --- !u!212 &787718562
@@ -1478,7 +1479,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _bulletManager: {fileID: 1278032026}
   _sectionSpeed: 3
-  _shotSpeed: 0.1
   _movementDistance: 2
   _laser: {fileID: 1278032028}
 --- !u!212 &1278032024
@@ -1694,6 +1694,132 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Laser
   _laserSO: {fileID: 11400000, guid: c258568af1951ad469a6a4b7de520387, type: 2}
   _laserLine: {fileID: 1278032027}
+--- !u!1 &1548018181
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1548018184}
+  - component: {fileID: 1548018183}
+  - component: {fileID: 1548018182}
+  m_Layer: 0
+  m_Name: NegativeSection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1548018182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548018181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BulletManager
+  _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
+  _bulletPoolSize: 50
+--- !u!114 &1548018183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548018181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0775a26aeb46ea44928158e81af8edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossSection
+  _bulletManager: {fileID: 1548018182}
+  _sectionSpeed: 1
+  _movementDistance: 2
+  _laser: {fileID: 0}
+--- !u!4 &1548018184
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548018181}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1763710631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1763710634}
+  - component: {fileID: 1763710633}
+  - component: {fileID: 1763710632}
+  m_Layer: 0
+  m_Name: PositiveSection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1763710632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763710631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BulletManager
+  _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
+  _bulletPoolSize: 50
+--- !u!114 &1763710633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763710631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0775a26aeb46ea44928158e81af8edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossSection
+  _bulletManager: {fileID: 1763710632}
+  _sectionSpeed: 1
+  _movementDistance: 2
+  _laser: {fileID: 0}
+--- !u!4 &1763710634
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763710631}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1911772270
 GameObject:
   m_ObjectHideFlags: 0
@@ -1703,6 +1829,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1911772271}
+  - component: {fileID: 1911772273}
+  - component: {fileID: 1911772272}
   m_Layer: 0
   m_Name: SectionParent
   m_TagString: Untagged
@@ -1729,6 +1857,36 @@ Transform:
   - {fileID: 787718563}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1911772272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911772270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BulletManager
+  _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
+  _bulletPoolSize: 50
+--- !u!114 &1911772273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911772270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0775a26aeb46ea44928158e81af8edd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossSection
+  _bulletManager: {fileID: 1911772272}
+  _sectionSpeed: 1
+  _movementDistance: 2
+  _laser: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1739,3 +1897,5 @@ SceneRoots:
   - {fileID: 207269331}
   - {fileID: 588681023}
   - {fileID: 1911772271}
+  - {fileID: 1548018184}
+  - {fileID: 1763710634}

@@ -27,6 +27,10 @@ public class Laser : MonoBehaviour
 
         StartCoroutine(InitialLaserShot());
     }
+    public void StopLaser()
+    {
+        StopAllCoroutines();
+    }
     private IEnumerator InitialLaserShot()
     {
 
