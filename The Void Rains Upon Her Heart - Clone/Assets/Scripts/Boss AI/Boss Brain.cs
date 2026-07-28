@@ -13,19 +13,9 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private GameObject _sectionsParent;
     [SerializeField] private BossSection _negativeSection;
     [SerializeField] private BossSection _positiveSection;
-    
-    [SerializeField] private float _sectionsParentRotationSpeed = 40f;
-    [SerializeField] private float _bulletSectionRotationSpeed = 60f;
+    [SerializeField] private BossSettingsSO _bossSettingsSO;
     private BoundsInt _leftArenaBounds;
     [SerializeField] private List<BossSection> _sectionList = new(4);
-    [Header("General Attacks")]
-    [SerializeField] private float _attackDelay = 2f;
-    [SerializeField] private float _timeToMoveToAttackPosition = 2f;
-    [Header("SinWave Attack")]
-    [SerializeField] private float _sinWaveAttackTime = 6.5f;
-    [SerializeField] private float _sinShotSpeed = 0.2f;
-    [Header("SpinningBullet Attack")]
-    [SerializeField] private float _spinningBulletTime = 3f;
 
     private List<BossSection> _section1 = new(2);
     private List<BossSection> _section2 = new(2);
@@ -82,7 +72,7 @@ public class BossBrain : MonoBehaviour
         _onAttackDone?.Invoke();
 
         //TestPhase2();
-        //StartCoroutine(GoPhase2AfterTime());
+        StartCoroutine(GoPhase2AfterTime());
     }
 
     void OnDisable()
@@ -90,6 +80,7 @@ public class BossBrain : MonoBehaviour
         _onAttackDone -= SendAttack;
         _onAttackDone -= SendPhase2Attack;
     }
+    #region Phase2 Testing
     private IEnumerator GoPhase2AfterTime()
     {
         yield return new WaitForSeconds(60f);
@@ -103,6 +94,7 @@ public class BossBrain : MonoBehaviour
             OnSectionBroken(bossSection);
         }
     }
+    #endregion
     private void OnSectionBroken(BossSection bossSection)
     {
         bossSection.OnSectionDestroyed -= OnSectionBroken;
@@ -131,14 +123,14 @@ public class BossBrain : MonoBehaviour
         PutIntoSections();
 
         float xPosition = 0f;
-        float yPosition = _arenaBounds.center.y + 2;
+        float yPosition = _arenaBounds.center.y + _bossSettingsSO.Phase2Offset;
 
         Vector2 movePosition = new(xPosition,yPosition);
         Vector2 sectionRotation = Vector2.up;
 
         foreach(BossSection bossSection in _section1)
         {
-            bossSection.MoveSection(movePosition,3f);
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToPhase2);
             bossSection.OnFinishedMove += CanStartPhase2Attacks;
             bossSection.OnSectionDestroyed += StopLaser;
 
@@ -152,14 +144,14 @@ public class BossBrain : MonoBehaviour
 
         sectionRotation = Vector2.right;
 
-        xPosition = _arenaBounds.center.x + 2;
+        xPosition = _arenaBounds.center.x + _bossSettingsSO.Phase2Offset;
         yPosition = 0f;
 
         movePosition = new(xPosition,yPosition);
 
         foreach(BossSection bossSection in _section2)
         {
-            bossSection.MoveSection(movePosition,3f);
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToPhase2);
             bossSection.OnFinishedMove += CanStartPhase2Attacks;
 
             bossSection.transform.up = sectionRotation;
@@ -198,9 +190,9 @@ public class BossBrain : MonoBehaviour
     {
         while(true)
         {
-            _sectionsParent.transform.Rotate(0,0,_sectionsParentRotationSpeed*Time.deltaTime);
-            _positiveSection.transform.Rotate(0,0,_bulletSectionRotationSpeed*Time.deltaTime);
-            _negativeSection.transform.Rotate(0,0,-_bulletSectionRotationSpeed*Time.deltaTime);
+            _sectionsParent.transform.Rotate(0,0,_bossSettingsSO.SectionsParentRotationSpeed*Time.deltaTime);
+            _positiveSection.transform.Rotate(0,0,_bossSettingsSO.BulletSectionRotationSpeed*Time.deltaTime);
+            _negativeSection.transform.Rotate(0,0,-_bossSettingsSO.BulletSectionRotationSpeed*Time.deltaTime);
             yield return null;
         }
     }
@@ -221,31 +213,45 @@ public class BossBrain : MonoBehaviour
     }
     private IEnumerator WaitBeforePhase2Attack()
     {
-        yield return new WaitForSeconds(_attackDelay);
+        yield return new WaitForSeconds(_bossSettingsSO.AttackDelay);
         if(_previousAttack == 0)
         {
-            StartCoroutine(BulletSpreadAttack(1.5f));
+            StartCoroutine(BulletSpreadAttack(_bossSettingsSO.BulletSpreadAttackTime));
         }
         else
         {
-            StartCoroutine(FourBulletAttack(0.1f,2f));
+            StartCoroutine(FourBulletAttack(_bossSettingsSO.FourBulletAttackTime,_bossSettingsSO.FourBulletAttackWait));
         }
     }
     private IEnumerator FourBulletAttack(float shotWaitTime,float negativeWaitTime)
     {
-        int bulletAmount = 6;
-        for (int i = 0; i < 4; i++)
+        int bulletAmount = _bossSettingsSO.FourBulletBulletAmount;
+        for (int i = 0; i < _bossSettingsSO.FourBulletBulletRingAmount; i++)
         {
             if (i % 2 == 0)
             {
-                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Up,_bossSettingsSO.FourBulletOffset);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Down,_bossSettingsSO.FourBulletOffset);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Left,_bossSettingsSO.FourBulletOffset);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Right,_bossSettingsSO.FourBulletOffset);
             }
             else
             {
-                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Up,_bossSettingsSO.FourBulletOffset);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Down,_bossSettingsSO.FourBulletOffset);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Left,_bossSettingsSO.FourBulletOffset);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Right,_bossSettingsSO.FourBulletOffset);
             }
 
-            if (i < 3)
+            if (i < _bossSettingsSO.FourBulletBulletRingAmount - 1)
             {
                 yield return new WaitForSeconds(negativeWaitTime);
             }
@@ -255,30 +261,31 @@ public class BossBrain : MonoBehaviour
     }
     private IEnumerator BulletSpreadAttack(float timeBetweenAttacks)
     {
-        float degreeToRotate = 360f/7f;
-        float phaseOffset = degreeToRotate/2f;
-        for (int i = 0; i < 4; i++)
+        float phaseOffset = _bossSettingsSO.BulletSpreadRotationDegrees/2f;
+        for (int i = 0; i < _bossSettingsSO.BulletSpreadBulletCircleAmount; i++)
         {
             Vector2 originalShootDirection = Vector2.right;
             if (i % 2 == 0)
             {
-                for(int j = 0 ; j < 7 ; j++)
+                for(int j = 0 ; j < _bossSettingsSO.BulletSpreadBulletAmount ; j++)
                 {
                     _positiveSection.ShootBullet(originalShootDirection);
-                    originalShootDirection = Quaternion.Euler(0f,0f,degreeToRotate) * originalShootDirection;
+                    originalShootDirection = Quaternion.Euler(0f,0f,_bossSettingsSO.BulletSpreadRotationDegrees) 
+                    * originalShootDirection;
                 }
             }
             else
             {
                 originalShootDirection = Quaternion.Euler(0f,0f,phaseOffset) * originalShootDirection;
-                for(int j = 0 ; j < 7 ; j++)
+                for(int j = 0 ; j < _bossSettingsSO.BulletSpreadBulletAmount ; j++)
                 {
                     _negativeSection.ShootBullet(originalShootDirection);
-                    originalShootDirection = Quaternion.Euler(0f,0f,degreeToRotate) * originalShootDirection;
+                    originalShootDirection = Quaternion.Euler(0f,0f,_bossSettingsSO.BulletSpreadRotationDegrees) 
+                    * originalShootDirection;
                 }
             }
 
-            if (i < 3)
+            if (i < _bossSettingsSO.BulletSpreadBulletCircleAmount - 1)
             {
                 yield return new WaitForSeconds(timeBetweenAttacks);
             }    
@@ -287,17 +294,13 @@ public class BossBrain : MonoBehaviour
         _previousAttack = 1;
         _onAttackDone?.Invoke(); 
     }
-    private IEnumerator SevenBulletsAttack()
-    {
-        yield return null;
-    }
     private void SendAttack()
     {
         StartCoroutine(WaitBeforeAttack());
     }
     private IEnumerator WaitBeforeAttack()
     {
-        yield return new WaitForSeconds(_attackDelay);
+        yield return new WaitForSeconds(_bossSettingsSO.AttackDelay);
 
         SendPhase1Attack();
     }
@@ -342,7 +345,7 @@ public class BossBrain : MonoBehaviour
 
         foreach(BossSection bossSection in _section1)
         {
-            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
+            bossSection.MoveSection(sectionPosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanSpinningBulletAttack;
 
 
@@ -357,7 +360,7 @@ public class BossBrain : MonoBehaviour
         sectionPosition.x *= -1;
         foreach(BossSection bossSection in _section2)
         {
-            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
+            bossSection.MoveSection(sectionPosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanSpinningBulletAttack;
 
 
@@ -393,9 +396,10 @@ public class BossBrain : MonoBehaviour
     {
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.RotateAndShoot(0.5f,40f);
+            bossSection.RotateAndShoot(_bossSettingsSO.SpinningBulletShootTime,
+            _bossSettingsSO.SpinningBulletRotateSpeed);
         }
-        yield return new WaitForSeconds(_spinningBulletTime);
+        yield return new WaitForSeconds(_bossSettingsSO.SpinningBulletTime);
         foreach(BossSection bossSection in _sectionList)
         {
             bossSection.RotateAndShoot();
@@ -408,12 +412,12 @@ public class BossBrain : MonoBehaviour
     private void StartLineLaserAttack()
     {
         float yOffset = 2 *_arenaBounds.yMax / 5;
-        float xPosition = _arenaBounds.xMax * 96/100;
+        float xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
         Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset);
 
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSection(movePosition,_timeToMoveToAttackPosition);
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanLineLaserAttack;
             bossSection.transform.up = Vector2.left;
             movePosition.y -= yOffset;
@@ -477,13 +481,13 @@ public class BossBrain : MonoBehaviour
     private void StartXLaserAttack()
     {
         PutIntoSections();
-        float xPosition = _arenaBounds.xMin * 96/100;
-        float yPosition = _arenaBounds.yMax * 96/100;
+        float xPosition = _arenaBounds.xMin * _bossSettingsSO.ArenaPaddingPercentageX;
+        float yPosition = _arenaBounds.yMax * _bossSettingsSO.ArenaPaddingPercentageX;
         Vector2 sectionPosition = new(xPosition,yPosition);
         
         foreach(BossSection bossSection in _section1)
         {
-            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
+            bossSection.MoveSection(sectionPosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanXLaserAttack;
             bossSection.transform.up = Vector2.right;
             sectionPosition.y *= -1;
@@ -493,7 +497,7 @@ public class BossBrain : MonoBehaviour
         sectionPosition.y = yPosition / 4f;
         foreach(BossSection bossSection in _section2)
         {
-            bossSection.MoveSection(sectionPosition,_timeToMoveToAttackPosition);
+            bossSection.MoveSection(sectionPosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanXLaserAttack;
             bossSection.transform.up = Vector2.left;
             sectionPosition.y *= -1;
@@ -554,12 +558,12 @@ public class BossBrain : MonoBehaviour
     private void StartSinAttack()
     {
         float yOffset = 2 *_arenaBounds.yMax / 5;
-        float xPosition = _arenaBounds.xMax * 96/100;
+        float xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
         Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset);
 
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSection(movePosition,_timeToMoveToAttackPosition);
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += CheckIfCanSinAttack;
             bossSection.transform.up = Vector2.left;
             movePosition.y -= yOffset;
@@ -588,12 +592,12 @@ public class BossBrain : MonoBehaviour
     {
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSinWave(_sinShotSpeed);
+            bossSection.MoveSinWave(_bossSettingsSO.SinShotSpeed,_bossSettingsSO.SinWaveBulletSpeed);
         }
-        yield return new WaitForSeconds(_sinWaveAttackTime);
+        yield return new WaitForSeconds(_bossSettingsSO.SinWaveAttackTime);
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSinWave(_sinShotSpeed);
+            bossSection.MoveSinWave(_bossSettingsSO.SinShotSpeed,_bossSettingsSO.SinWaveBulletSpeed);
         }
 
         _previousAttack = 0;
