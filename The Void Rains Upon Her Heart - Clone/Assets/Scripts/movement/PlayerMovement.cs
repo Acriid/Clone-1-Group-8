@@ -1,4 +1,4 @@
- using UnityEngine;
+  using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
@@ -33,6 +33,16 @@ public class PlayerMovement : MonoBehaviour
         if (Keyboard.current.rightArrowKey.isPressed) moveX = 1f;
 
         moveInput = new Vector2(moveX, moveY).normalized;
+
+        Flip();
+    }
+
+    void Flip()
+    {
+        if (Keyboard.current.downArrowKey.wasPressedThisFrame)
+        {
+            transform.Rotate(0, 180, 0);
+        }
     }
 
     void FixedUpdate()
