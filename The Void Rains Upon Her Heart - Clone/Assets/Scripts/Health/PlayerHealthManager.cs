@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class PlayerHealthManager : MonoBehaviour
 {
@@ -9,11 +10,17 @@ public class PlayerHealthManager : MonoBehaviour
 
     public UnityEvent OnPlayerDeath;
 
+    
+    [SerializeField] private Slider _HealthSlider;
 
+
+   
     // sets current health at start to the players max health
     private void Awake()
     {
         _CurrentHealth = _MaxHealth;
+        _HealthSlider.maxValue = _MaxHealth;
+        _HealthSlider.value = _CurrentHealth;
     }
 
     // used by bullet script to damage the player
@@ -21,6 +28,7 @@ public class PlayerHealthManager : MonoBehaviour
     {
         _CurrentHealth -= damage;
         _CurrentHealth = Mathf.Clamp(_CurrentHealth, 0, _MaxHealth); //makes sure current health doesnt fall below 0
+        _HealthSlider.value = _CurrentHealth; // update UI
 
         Debug.Log($"Player Health: {_CurrentHealth}");
 
