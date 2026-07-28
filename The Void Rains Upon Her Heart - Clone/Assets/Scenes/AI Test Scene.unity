@@ -1725,7 +1725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
   _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
-  _bulletPoolSize: 50
+  _bulletPoolSize: 70
 --- !u!114 &1548018183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1788,7 +1788,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
   _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
-  _bulletPoolSize: 50
+  _bulletPoolSize: 70
 --- !u!114 &1763710633
 MonoBehaviour:
   m_ObjectHideFlags: 0
