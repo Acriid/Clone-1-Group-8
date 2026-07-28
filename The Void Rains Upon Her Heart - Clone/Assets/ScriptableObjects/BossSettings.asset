@@ -15,7 +15,7 @@ MonoBehaviour:
   BossLevel: 1
   ArenaPaddingPercentageX: 0.96
   BossHealth: 1929
-  SectionsParentRotationSpeed: 40
+  SectionsParentRotationSpeed: 20
   BulletSectionRotationSpeed: 60
   AttackDelay: 2
   TimeToMoveToAttackPosition: 2

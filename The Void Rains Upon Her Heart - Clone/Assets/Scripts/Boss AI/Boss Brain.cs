@@ -72,7 +72,7 @@ public class BossBrain : MonoBehaviour
         _onAttackDone?.Invoke();
 
         //TestPhase2();
-        StartCoroutine(GoPhase2AfterTime());
+        // StartCoroutine(GoPhase2AfterTime());
     }
 
     void OnDisable()

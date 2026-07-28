@@ -1736,7 +1736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0775a26aeb46ea44928158e81af8edd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
-  _positiveBulletManager: {fileID: 0}
+  _positiveBulletManager: {fileID: 1548018182}
   _negativeBulletManager: {fileID: 0}
   _sectionSpeed: 1
   _movementDistance: 2
@@ -1800,7 +1800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0775a26aeb46ea44928158e81af8edd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
-  _positiveBulletManager: {fileID: 0}
+  _positiveBulletManager: {fileID: 1763710632}
   _negativeBulletManager: {fileID: 0}
   _sectionSpeed: 1
   _movementDistance: 2
