@@ -38,6 +38,17 @@ public class BulletManager : MonoBehaviour
         instance.OnBulletRemoved += ReturnBullet;
         instance.Shoot(spawnPoint,bulletDirection);
     }
+    public void ShootBullet(Vector2 spawnPoint, Vector2 bulletDirection,float bulletSpeed)
+    {
+        
+        Bullet instance = _bulletPool.Get();
+        _activeBullets.Add(instance);
+
+        //Subscribe event
+        instance.OnBulletRemoved += ReturnBullet;
+        instance.Shoot(spawnPoint,bulletDirection,bulletSpeed);
+    }
+
 
     //Removes bullet after it has hit something or reached the end of its lifetime
     private void ReturnBullet(Bullet bulletToReturn)

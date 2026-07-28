@@ -70,6 +70,34 @@ public class Bullet : MonoBehaviour
         _bulletRigidBody.AddForce(gameObject.transform.right * _bulletSO.BulletSpeed * BULLETSPEEDOFFSET);
 
     }
+    public void Shoot(Vector2 spawnPoint, Vector2 bulletDirection,float speedToUse)
+    {
+        if(_bulletSO == null)
+        {
+            Debug.LogError("Bullet ScriptableObject is not set");
+            return;
+        }
+        if(_bulletRigidBody == null)
+        {
+            Debug.LogError("Bullet RigidBody is not set");
+            return;           
+        }
+        
+        if(_despawnRoutine != null)
+        {
+            Debug.LogWarning("Attempting to shoot a bullet that was already shot");
+            return;
+        }
+
+        _despawnRoutine = StartCoroutine(DespawnBullet());
+
+        //Set position and rotation
+        gameObject.transform.position = spawnPoint;
+        gameObject.transform.right = bulletDirection;
+
+        _bulletRigidBody.AddForce(gameObject.transform.right * speedToUse * BULLETSPEEDOFFSET);
+
+    }
     private IEnumerator DespawnBullet()
     {
         yield return _bulletDespawnWaitTime;

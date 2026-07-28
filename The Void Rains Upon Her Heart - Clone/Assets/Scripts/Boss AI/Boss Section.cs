@@ -7,7 +7,8 @@ using UnityEngine;
 public class BossSection : MonoBehaviour
 {
 
-    [SerializeField] private BulletManager _bulletManager;
+    [SerializeField] private BulletManager _positiveBulletManager;
+    [SerializeField] private BulletManager _negativeBulletManager;
     [SerializeField] private float _sectionSpeed = 1f;
     
 
@@ -32,13 +33,7 @@ public class BossSection : MonoBehaviour
     private Coroutine _bulletRoutine = null;
     private Coroutine _rotateRoutine = null;
 
-    private List<Coroutine> _routineList = new(4)
-    {
-        null,
-        null,
-        null,
-        null
-    };
+    private bool _isPositive = true;
     #region Damage
 
     public void Damage(float damage)
@@ -189,11 +184,11 @@ public class BossSection : MonoBehaviour
     }
     #endregion
     #region SinWave
-    public void MoveSinWave(float shotSpeed)
+    public void MoveSinWave(float shotSpeed,float bulletSpeed)
     {
         if(_sinRoutine != null)
         {
-            ShootBullet(shotSpeed,Vector2.left);
+            ShootBullet(shotSpeed,Vector2.left,bulletSpeed);
             StopCoroutine(_sinRoutine);
             _sinRoutine = null;
         }
@@ -201,7 +196,7 @@ public class BossSection : MonoBehaviour
         {
             _startPosition = transform.position;
             _sinRoutine = StartCoroutine(MoveSinWaveEnumerator());
-            ShootBullet(shotSpeed,Vector2.left);
+            ShootBullet(shotSpeed,Vector2.left,bulletSpeed);
         }      
     }
 
@@ -222,7 +217,7 @@ public class BossSection : MonoBehaviour
     }
     #endregion
     #region Shooting Bullets
-    public void ShootBullet(float shotSpeed, Vector2 shootDirection)
+    public void ShootBullet(float shotSpeed, Vector2 shootDirection,float bulletSpeed)
     {
         if(_bulletRoutine != null)
         {
@@ -231,17 +226,14 @@ public class BossSection : MonoBehaviour
         }
         else
         {
-            _bulletRoutine = StartCoroutine(ShootBullets(shotSpeed,shootDirection));
+            _bulletRoutine = StartCoroutine(ShootSinBullets(shotSpeed,shootDirection,bulletSpeed));
         }
     }
-    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount)
+    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount, BulletDirection direction, float offset)
     {
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Up,bulletAmount));
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Down,bulletAmount));
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Left,bulletAmount));
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Right,bulletAmount));
+        StartCoroutine(ShootBulletsFromDirection(shotSpeed,direction,bulletAmount,offset));
     }
-    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount)
+    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount,float offset)
     {
         
         WaitForSeconds waitTime = new(shotSpeed);
@@ -250,23 +242,42 @@ public class BossSection : MonoBehaviour
         while (bulletsShot < bulletAmount)
         {
             Vector2 dir = GetDirectionVector(direction);
+            dir = Quaternion.Euler(0f,0f,offset) * dir;
             ShootBullet(dir);
             bulletsShot++;
             yield return waitTime;
         }
     }
-    private IEnumerator ShootBullets(float shootSpeed, Vector2 shootDirection)
+    private IEnumerator ShootSinBullets(float shootSpeed, Vector2 shootDirection, float bulletSpeed)
     {
         WaitForSeconds waitTime = new(shootSpeed);
         while(true)
         {
-            ShootBullet(shootDirection);
+            ShootBullet(shootDirection,bulletSpeed);
             yield return waitTime;
         }
     }
     public void ShootBullet(Vector2 bulletDirection)
     {
-        _bulletManager.ShootBullet(transform.position,bulletDirection);
+        if(_isPositive)
+        {
+            _positiveBulletManager.ShootBullet(transform.position,bulletDirection);
+        }
+        else
+        {
+            _negativeBulletManager.ShootBullet(transform.position,bulletDirection);
+        }
+    }
+    public void ShootBullet(Vector2 bulletDirection, float bulletSpeed)
+    {
+        if(_isPositive)
+        {
+            _positiveBulletManager.ShootBullet(transform.position,bulletDirection,bulletSpeed);
+        }
+        else
+        {
+            _negativeBulletManager.ShootBullet(transform.position,bulletDirection,bulletSpeed);
+        }
     }
     #endregion
     #region Laser
