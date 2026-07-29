@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestBossLaser 2
   m_EditorClassIdentifier: Assembly-CSharp::LaserSO
   LaserShootDelay: 1.5
-  LaserDamage: 0
+  LaserDamage: 4
   LaserLifetime: Infinity
   LaserWidth: 2
   PlayerMask:

@@ -32,13 +32,23 @@ public class Bullet : MonoBehaviour
             StopDespawnRoutine();
             OnBulletRemoved?.Invoke(this);
         }
-        else if(_bulletSO.BossBullet && collision.collider.CompareTag("Boss"))
+        else if(!_bulletSO.BossBullet && collision.collider.CompareTag("Boss"))
         {
-            //TODO - Damage the boss
+            if(collision.collider.TryGetComponent<BossSection>(out BossSection component))
+            {
+                component.Damage(_bulletSO.BulletDamage);
+                OnBulletRemoved?.Invoke(this);
+                StopDespawnRoutine();
+            }
         }
         else if(collision.collider.CompareTag("Player"))
         {
-            //TODO - Damage the player
+            if(collision.collider.TryGetComponent<PlayerHealthManager>(out PlayerHealthManager component))
+            {
+                component.TakeDamage(_bulletSO.BulletDamage);
+                OnBulletRemoved?.Invoke(this);
+                StopDespawnRoutine();
+            }
         }
 
     }

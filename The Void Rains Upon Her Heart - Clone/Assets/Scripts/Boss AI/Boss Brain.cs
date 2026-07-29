@@ -71,6 +71,10 @@ public class BossBrain : MonoBehaviour
         _onAttackDone += SendAttack;
         _onAttackDone?.Invoke();
 
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.OnSectionDestroyed += OnSectionBroken;
+        }
         //TestPhase2();
         // StartCoroutine(GoPhase2AfterTime());
     }
@@ -79,6 +83,11 @@ public class BossBrain : MonoBehaviour
     {
         _onAttackDone -= SendAttack;
         _onAttackDone -= SendPhase2Attack;
+
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.OnSectionDestroyed -= OnSectionBroken;
+        }
     }
     #region Phase2 Testing
     private IEnumerator GoPhase2AfterTime()
@@ -111,6 +120,7 @@ public class BossBrain : MonoBehaviour
         {
             bossSection1.StopLaser();
             bossSection1.StopAllRoutines();
+            bossSection1.IndicateDestroyed();
         }
         _onAttackDone -= SendAttack;
         _onAttackDone += SendPhase2Attack;
@@ -640,5 +650,14 @@ public class BossBrain : MonoBehaviour
         }
 
         return resultPosition;
+    }
+
+    public float GetMaxHealth()
+    {
+        return _bossSettingsSO.BossHealth;
+    }
+    public List<BossSection> GetBossSections()
+    {
+        return _sectionList;
     }
 }

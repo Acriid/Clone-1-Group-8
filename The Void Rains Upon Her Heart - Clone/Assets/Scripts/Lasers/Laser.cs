@@ -79,6 +79,10 @@ public class Laser : MonoBehaviour
             Collider2D hit = Physics2D.OverlapBox(_laserMiddle,_laserSize,_laserAngle,_laserSO.PlayerMask);
             if(hit)
             {
+                if(hit.TryGetComponent<PlayerHealthManager>(out PlayerHealthManager component))
+                {
+                    component.TakeDamage(_laserSO.LaserDamage);
+                }
             }
 
             UpdateLaserPosition();

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afcc9806cfa5521499ed5123375892b1, type: 3}
   m_Name: PlayerBullet
   m_EditorClassIdentifier: Assembly-CSharp::BulletSO
-  BulletSpeed: 10
-  BulletDamage: 0
-  BulletLifetime: 2
+  BulletSpeed: 17
+  BulletDamage: 4
+  BulletLifetime: 5
   BouncyBullet: 0
   BossBullet: 0

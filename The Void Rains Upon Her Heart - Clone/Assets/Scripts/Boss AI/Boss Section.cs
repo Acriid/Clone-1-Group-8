@@ -14,6 +14,8 @@ public class BossSection : MonoBehaviour
 
     [SerializeField] private float _movementDistance = 2f;
     [SerializeField] private Laser _laser;
+    //Temp Delete Later
+    public SpriteRenderer SpriteRenderer;
 
     //Health for lvl 2 per section is 349
     //Health for lvl 2 for phase 2 is 97 per section
@@ -41,18 +43,30 @@ public class BossSection : MonoBehaviour
         if(_sectionDestroyed)
         {
             damage *= 0f;
+            if(SpriteRenderer.color != Color.red)
+            {
+                SpriteRenderer.color = Color.red;
+            }
         }
         else
         {
+            StartCoroutine(IndicateHit());
             _sectionHealth -= damage;
             if(_sectionHealth <= 0)
             {
                 _sectionDestroyed = true;
                 OnSectionDestroyed?.Invoke(this);
+                SpriteRenderer.color = Color.red;
             }
         }
 
         OnBossDamage?.Invoke(damage);
+    }
+    private IEnumerator IndicateHit()
+    {
+        SpriteRenderer.color = Color.gray;
+        yield return new WaitForSeconds(0.1f);
+        SpriteRenderer.color = Color.white;
     }
     #endregion
     //DELETE LATER
@@ -62,7 +76,10 @@ public class BossSection : MonoBehaviour
         _sectionDestroyed = true;
         OnSectionDestroyed?.Invoke(this);
     }
-
+    public void IndicateDestroyed()
+    {
+        SpriteRenderer.color = Color.red;
+    }
     private void DestroySection()
     {
         //TODO - implement the sprite change
