@@ -7,4 +7,5 @@ public class LaserSO : ScriptableObject
     public float LaserDamage = 0f;
     public float LaserLifetime = 1f;
     public float LaserWidth = 5f;
+    public LayerMask PlayerMask;
 }

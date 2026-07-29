@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 268a8b2975c2f0942a75e2b04737a9f8, type: 3}
+  m_Name: BossSettings
+  m_EditorClassIdentifier: Assembly-CSharp::BossSettingsSO
+  BossLevel: 1
+  ArenaPaddingPercentageX: 0.96
+  BossHealth: 1929
+  SectionsParentRotationSpeed: 20
+  BulletSectionRotationSpeed: 60
+  AttackDelay: 2
+  TimeToMoveToAttackPosition: 2
+  SinWaveAttackTime: 6.5
+  SinShotSpeed: 0.1
+  SinWaveBulletSpeed: 10
+  SpinningBulletTime: 3
+  SpinningBulletShootTime: 0.5
+  SpinningBulletRotateSpeed: 40
+  FourBulletAttackWait: 2
+  FourBulletAttackTime: 0.1
+  FourBulletOffset: 0
+  FourBulletBulletAmount: 6
+  FourBulletBulletRingAmount: 4
+  Phase2Offset: 2
+  TimeToMoveToPhase2: 3
+  BulletSpreadAttackTime: 1.5
+  BulletSpreadRotationDegrees: 51.42857
+  BulletSpreadBulletAmount: 7
+  BulletSpreadBulletCircleAmount: 4

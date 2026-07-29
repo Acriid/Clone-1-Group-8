@@ -30,24 +30,34 @@ public class BulletManager : MonoBehaviour
     /// <param name="bulletDirection">The direction the bullet is getting shot in</param>
     public void ShootBullet(Vector2 spawnPoint, Vector2 bulletDirection)
     {
+        
         Bullet instance = _bulletPool.Get();
         _activeBullets.Add(instance);
 
         //Subscribe event
         instance.OnBulletRemoved += ReturnBullet;
         instance.Shoot(spawnPoint,bulletDirection);
-
-        Debug.Log("Shot Bullet");
     }
+    public void ShootBullet(Vector2 spawnPoint, Vector2 bulletDirection,float bulletSpeed)
+    {
+        
+        Bullet instance = _bulletPool.Get();
+        _activeBullets.Add(instance);
+
+        //Subscribe event
+        instance.OnBulletRemoved += ReturnBullet;
+        instance.Shoot(spawnPoint,bulletDirection,bulletSpeed);
+    }
+
 
     //Removes bullet after it has hit something or reached the end of its lifetime
     private void ReturnBullet(Bullet bulletToReturn)
     {
-        Debug.Log("Returned Bullet");
         //UnSubscribe event
         bulletToReturn.OnBulletRemoved -= ReturnBullet;
         
-        _activeBullets.Remove(bulletToReturn);
         _bulletPool.Return(bulletToReturn);
+        _activeBullets.Remove(bulletToReturn);
+        
     }
 }

@@ -5,14 +5,16 @@ TagManager:
   serializedVersion: 3
   tags:
   - Boss
+  - MapEdge
+  - Bullet
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Bullet
   - Water
   - UI
-  - 
+  - Player
   - 
   - 
   - 

@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afcc9806cfa5521499ed5123375892b1, type: 3}
-  m_Name: TestBullet
-  m_EditorClassIdentifier: Assembly-CSharp::BulletSO
-  BulletSpeed: 10
-  BulletDamage: 0
-  BulletLifetime: 3
-  BouncyBullet: 0
-  BossBullet: 0
+  m_Script: {fileID: 11500000, guid: 005abbaeecabcb54eaaf2987fb338c18, type: 3}
+  m_Name: TestBossLaser
+  m_EditorClassIdentifier: Assembly-CSharp::LaserSO
+  LaserShootDelay: 1.5
+  LaserDamage: 0
+  LaserLifetime: 4
+  LaserWidth: 2

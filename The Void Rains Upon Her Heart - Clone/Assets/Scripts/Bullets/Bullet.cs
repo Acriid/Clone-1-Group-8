@@ -27,6 +27,11 @@ public class Bullet : MonoBehaviour
         {
             //TODO - Code the bullet bounce
         }
+        else if (collision.collider.CompareTag("MapEdge"))
+        {
+            StopDespawnRoutine();
+            OnBulletRemoved?.Invoke(this);
+        }
         else if(_bulletSO.BossBullet && collision.collider.CompareTag("Boss"))
         {
             //TODO - Damage the boss
@@ -65,6 +70,34 @@ public class Bullet : MonoBehaviour
         _bulletRigidBody.AddForce(gameObject.transform.right * _bulletSO.BulletSpeed * BULLETSPEEDOFFSET);
 
     }
+    public void Shoot(Vector2 spawnPoint, Vector2 bulletDirection,float speedToUse)
+    {
+        if(_bulletSO == null)
+        {
+            Debug.LogError("Bullet ScriptableObject is not set");
+            return;
+        }
+        if(_bulletRigidBody == null)
+        {
+            Debug.LogError("Bullet RigidBody is not set");
+            return;           
+        }
+        
+        if(_despawnRoutine != null)
+        {
+            Debug.LogWarning("Attempting to shoot a bullet that was already shot");
+            return;
+        }
+
+        _despawnRoutine = StartCoroutine(DespawnBullet());
+
+        //Set position and rotation
+        gameObject.transform.position = spawnPoint;
+        gameObject.transform.right = bulletDirection;
+
+        _bulletRigidBody.AddForce(gameObject.transform.right * speedToUse * BULLETSPEEDOFFSET);
+
+    }
     private IEnumerator DespawnBullet()
     {
         yield return _bulletDespawnWaitTime;
@@ -79,5 +112,7 @@ public class Bullet : MonoBehaviour
             Debug.LogWarning("StopDespawnRoutine called when _despawnRoutine is null");
             return;
         }
+        StopCoroutine(_despawnRoutine);
+        _despawnRoutine = null;
     }
 }
