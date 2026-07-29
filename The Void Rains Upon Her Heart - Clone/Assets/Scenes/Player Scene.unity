@@ -257,8 +257,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e0308f0fe7291040b7f8d87c76bca02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 2
-  dashSpeed: 12
+  moveSpeed: 8
+  dashSpeed: 4
   dashDuration: 0
   bulletManager: {fileID: 836611316}
   firePoint: {fileID: 264858416}
