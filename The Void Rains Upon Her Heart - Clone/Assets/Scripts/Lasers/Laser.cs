@@ -30,6 +30,7 @@ public class Laser : MonoBehaviour
     public void StopLaser()
     {
         StopAllCoroutines();
+        _laserLine.enabled = false;
     }
     private IEnumerator InitialLaserShot()
     {

@@ -16,4 +16,4 @@ MonoBehaviour:
   BulletDamage: 4
   BulletLifetime: 13
   BouncyBullet: 0
-  BossBullet: 0
+  BossBullet: 1

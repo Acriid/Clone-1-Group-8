@@ -9,7 +9,9 @@ public class BossSettingsSO : ScriptableObject
     [Range(1,2)]
     public int BossLevel = 1;
     public float ArenaPaddingPercentageX = 96f/100f;
-    public int BossHealth = 1929;
+    public float BossHealth = 1929;
+    public float SectionHealthPhase1 = 349;
+    public float SectionHealthPhase2 = 97;
     [Header("Rotation Speed")]
     public float SectionsParentRotationSpeed = 40f;
     public float BulletSectionRotationSpeed = 60f;

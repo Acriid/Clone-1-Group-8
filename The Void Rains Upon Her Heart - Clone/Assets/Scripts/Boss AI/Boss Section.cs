@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BossSection : MonoBehaviour
 {
-
+    private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
     [SerializeField] private BulletManager _positiveBulletManager;
     [SerializeField] private BulletManager _negativeBulletManager;
     [SerializeField] private float _sectionSpeed = 1f;
@@ -36,6 +36,8 @@ public class BossSection : MonoBehaviour
     private Coroutine _rotateRoutine = null;
 
     private bool _isPositive = true;
+
+    private int _currentPhase = 1;
     #region Damage
 
     public void Damage(float damage)
@@ -54,9 +56,13 @@ public class BossSection : MonoBehaviour
             _sectionHealth -= damage;
             if(_sectionHealth <= 0)
             {
+                
                 _sectionDestroyed = true;
                 OnSectionDestroyed?.Invoke(this);
                 SpriteRenderer.color = Color.red;
+
+                if(_currentPhase == 2)
+                gameObject.SetActive(false);
             }
         }
 
@@ -65,10 +71,17 @@ public class BossSection : MonoBehaviour
     private IEnumerator IndicateHit()
     {
         SpriteRenderer.color = Color.gray;
-        yield return new WaitForSeconds(0.1f);
+        yield return _waitForSeconds0_1;
         SpriteRenderer.color = Color.white;
     }
     #endregion
+    public void StartPhase2(float newHealth)
+    {
+        _sectionHealth = newHealth;
+        _currentPhase = 2;
+        SpriteRenderer.color = Color.white;
+        _sectionDestroyed = false;
+    }
     //DELETE LATER
     public void TESTDESTROYSECTION()
     {
@@ -340,6 +353,10 @@ public class BossSection : MonoBehaviour
         Debug.Log($"Current Time: {hour}:{minute}:{second}:{milliseconds}");         
     }
 
+    public void SetHealth(float newHealth)
+    {
+        _sectionHealth = newHealth;
+    }
 }
 
 public enum BulletDirection { Up, Down, Left, Right }

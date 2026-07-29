@@ -74,6 +74,7 @@ public class BossBrain : MonoBehaviour
         foreach(BossSection bossSection in _sectionList)
         {
             bossSection.OnSectionDestroyed += OnSectionBroken;
+            bossSection.SetHealth(_bossSettingsSO.SectionHealthPhase1);
         }
         //TestPhase2();
         // StartCoroutine(GoPhase2AfterTime());
@@ -115,7 +116,6 @@ public class BossBrain : MonoBehaviour
             if(!booleans) return;
         }
 
-        StopAllCoroutines();
         foreach(BossSection bossSection1 in _sectionList)
         {
             bossSection1.StopLaser();
@@ -125,6 +125,7 @@ public class BossBrain : MonoBehaviour
         _onAttackDone -= SendAttack;
         _onAttackDone += SendPhase2Attack;
         StartPhase2();
+        StopAllCoroutines();
     }
 
     private void StartPhase2()
@@ -191,6 +192,13 @@ public class BossBrain : MonoBehaviour
         {
             _sectionsFinishedMoving[i] = false;
         }
+
+
+        foreach(BossSection bossSection1 in _sectionList)
+        {
+            bossSection1.StartPhase2(_bossSettingsSO.SectionHealthPhase2);
+        }
+
 
 
         StartPhase2Attacks();
@@ -569,7 +577,7 @@ public class BossBrain : MonoBehaviour
     {
         float yOffset = 2 *_arenaBounds.yMax / 5;
         float xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
-        Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset);
+        Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset );
 
         foreach(BossSection bossSection in _sectionList)
         {
