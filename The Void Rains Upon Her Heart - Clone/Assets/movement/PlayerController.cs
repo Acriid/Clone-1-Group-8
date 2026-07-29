@@ -2,16 +2,15 @@
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float dashSpeed = 12f;
     [SerializeField] private float dashDuration = 0.15f;
     
-    [Header("Combat")]
-    [SerializeField] private GameObject bulletPrefab;
+    [Header("Combat Settings")]
+    [SerializeField] private BulletManager bulletManager;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 0.15f;
-    [SerializeField] private float bulletSpeed = 20f;
     
     private Rigidbody2D rb;
     private Camera mainCamera;
@@ -32,85 +31,115 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
         Cursor.lockState = CursorLockMode.Confined;
+        
+        // Quick sanity checks so I know if something's missing
+        if (bulletManager == null)
+            Debug.LogWarning("BulletManager not assigned on " + gameObject.name);
+        if (firePoint == null)
+            Debug.LogWarning("FirePoint not assigned on " + gameObject.name);
     }
     
     void Update()
     {
-        // MOVEMENT - Works with both old and new input systems
-        float horizontal = 0f;
-        float vertical = 0f;
-        
-        // Try old input first
-        #if ENABLE_LEGACY_INPUT_MANAGER
-        horizontal = Input.GetAxisRaw("Horizontal");
-        vertical = Input.GetAxisRaw("Vertical");
-        #endif
-        
-        // Also check new input if available
-        #if ENABLE_INPUT_SYSTEM
-        // If you're using the new system, uncomment and set up your input actions
-        // var keyboard = Keyboard.current;
-        // if (keyboard != null)
-        // {
-        //     if (keyboard.wKey.isPressed) vertical = 1f;
-        //     if (keyboard.sKey.isPressed) vertical = -1f;
-        //     if (keyboard.aKey.isPressed) horizontal = -1f;
-        //     if (keyboard.dKey.isPressed) horizontal = 1f;
-        // }
-        #endif
+        GetMovementInput();
+        GetAimDirection();
+        HandleShooting();
+        HandleDashTiming();
+    }
+    
+    void FixedUpdate()
+    {
+        MovePlayer();
+    }
+    
+    void GetMovementInput()
+    {
+        // WASD or arrow keys, your choice
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
         
         moveInput = new Vector2(horizontal, vertical);
+        
+        // Stops you from moving faster diagonally
         if (moveInput.magnitude > 1f)
             moveInput.Normalize();
         
-        // MOUSE POSITION
-        mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        
-        // DASH
+        // Dash only works if you're actually moving
         if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && moveInput != Vector2.zero)
         {
             StartDash();
         }
+    }
+    
+    void GetAimDirection()
+    {
+        // Where's the mouse in the game world?
+        mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         
-        // SHOOTING
-        isFiring = Input.GetMouseButton(0);
-        
-        // AIMING
+        // Direction from player to mouse
         Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
         aimDirection = direction;
         
+        // Spin the player to face the mouse
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
-        
-        // SHOOTING COOLDOWN
+        transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+    }
+    
+    void HandleShooting()
+    {
+        // Cooldown counting
         if (fireCooldown > 0)
             fireCooldown -= Time.deltaTime;
         
+        // Hold left click for auto-fire
+        isFiring = Input.GetMouseButton(0);
+        
         if (isFiring && fireCooldown <= 0)
         {
-            ShootBullet();
+            FireBullet();
             fireCooldown = fireRate;
         }
         
+        // Single click also works (catches the first frame of clicking)
         if (Input.GetMouseButtonDown(0) && fireCooldown <= 0)
         {
-            ShootBullet();
+            FireBullet();
             fireCooldown = fireRate;
-        }
-        
-        // DASH TIMER
-        if (isDashing)
-        {
-            dashTimer -= Time.deltaTime;
-            if (dashTimer <= 0)
-            {
-                isDashing = false;
-                rb.gravityScale = 1f;
-            }
         }
     }
     
-    void FixedUpdate()
+    void FireBullet()
+    {
+        // Don't crash if someone forgot to set things up
+        if (bulletManager == null || firePoint == null)
+            return;
+        
+        bulletManager.ShootBullet(firePoint.position, aimDirection);
+    }
+    
+    void HandleDashTiming()
+    {
+        if (!isDashing)
+            return;
+        
+        dashTimer -= Time.deltaTime;
+        
+        if (dashTimer <= 0f)
+        {
+            isDashing = false;
+            rb.gravityScale = 1f; // Turn gravity back on if you had it off
+        }
+    }
+    
+    void StartDash()
+    {
+        isDashing = true;
+        dashTimer = dashDuration;
+        dashDirection = moveInput.normalized;
+        rb.gravityScale = 0f; // Turn off gravity so you dash smoothly
+    }
+    
+    void MovePlayer()
     {
         if (isDashing)
         {
@@ -122,36 +151,13 @@ public class PlayerController : MonoBehaviour
         }
     }
     
-    void ShootBullet()
-    {
-        if (bulletPrefab == null || firePoint == null)
-            return;
-        
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
-        
-        if (bulletRb != null)
-        {
-            bulletRb.linearVelocity = aimDirection * bulletSpeed;
-        }
-        
-        Destroy(bullet, 3f);
-    }
-    
-    void StartDash()
-    {
-        isDashing = true;
-        dashTimer = dashDuration;
-        dashDirection = moveInput.normalized;
-        rb.gravityScale = 0f;
-    }
-    
+    // Shows where bullets come from in the editor - helpful for setup
     void OnDrawGizmosSelected()
     {
         if (firePoint != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(firePoint.position, 0.2f);
+            Gizmos.DrawWireSphere(firePoint.position, 0.15f);
         }
     }
 }
