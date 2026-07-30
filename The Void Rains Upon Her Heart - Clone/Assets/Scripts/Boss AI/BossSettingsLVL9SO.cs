@@ -8,4 +8,7 @@ public class BossSettingsLVL9SO : ScriptableObject
     public float SpinningLaserRotationSpeed = 4f;
     public float SpinningLaserBackAndForthSpeed = 10f;
     public float SpinningLaserBulletShotSpeed = 1f/3f;
+    [Header("SinWaveAttack")]
+    public float SinWaveAttackTime = 8f;
+    public float SinWaveShotInterval = 0.1f;
 }

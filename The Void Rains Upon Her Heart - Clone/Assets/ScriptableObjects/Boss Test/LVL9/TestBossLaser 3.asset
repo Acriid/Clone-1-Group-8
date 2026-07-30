@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 005abbaeecabcb54eaaf2987fb338c18, type: 3}
-  m_Name: TestBossLaser 2
+  m_Name: TestBossLaser 3
   m_EditorClassIdentifier: Assembly-CSharp::LaserSO
-  LaserShootDelay: 1.5
+  LaserShootDelay: 1
   LaserDamage: 4
   LaserLifetime: Infinity
   LaserWidth: 2

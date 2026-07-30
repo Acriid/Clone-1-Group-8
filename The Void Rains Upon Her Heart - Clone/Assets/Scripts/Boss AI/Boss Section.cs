@@ -151,11 +151,15 @@ public class BossSection : MonoBehaviour
     {
         _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotateSpeed));
     }
-    public void RotateAndShoot(float shootInterval,float rotationTime, Quaternion rotation,bool clockwise = false,bool shoot = true)
+    public void RotateAndShoot(float shootInterval,float rotationTime, float rotateAmount,bool clockwise = false,bool shoot = true)
     {
-        _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotationTime,rotation,clockwise,shoot));
+        _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotationTime,rotateAmount,clockwise,shoot));
     }
-
+    public void RotateBetweenAnglesAndShoot(float shootInterval,float rotationTime,float minRotation,float maxRotation,bool startTowardsMax,
+        bool inRotation,bool shoot = true)
+    {
+        _rotateRoutine = StartCoroutine(RotateBetweenAngles(shootInterval,rotationTime,minRotation,maxRotation,startTowardsMax,inRotation,shoot));
+    }
     public void RotateAndShoot()
     {
         if(_rotateRoutine != null)
@@ -182,24 +186,14 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
     }
-    private IEnumerator RotateOverTime(float shootInterval,float rotationTime,Quaternion finalRotation,bool clockwise = false, bool shoot = true)
+    private IEnumerator RotateOverTime(float shootInterval,float rotationTime,float rotationAmount,bool clockwise = false, bool shoot = true)
     {
         float bulletShot = -1f;
 
         float startAngle = transform.eulerAngles.z;
-        float targetAngle = finalRotation.eulerAngles.z;
-
-        float angleDifference;
-
-        if (clockwise)
-        {
-            angleDifference = Mathf.Repeat(startAngle - targetAngle, 360f);
-            angleDifference *= -1f;
-        }
-        else
-        {
-            angleDifference = Mathf.Repeat(targetAngle - startAngle, 360f);
-        }
+        float targetAngle = clockwise
+            ? startAngle - rotationAmount
+            : startAngle + rotationAmount;
 
         float elapsedTime = 0f;
 
@@ -209,7 +203,10 @@ public class BossSection : MonoBehaviour
 
             float t = Mathf.Clamp01(elapsedTime / rotationTime);
 
-            float currentAngle = startAngle + angleDifference * t;
+            float currentAngle = Mathf.Lerp(
+                startAngle,
+                targetAngle,
+                t);
 
             transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
 
@@ -224,7 +221,75 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
 
-        transform.rotation = finalRotation;
+        transform.rotation = Quaternion.Euler(0f, 0f, targetAngle);
+    }
+    private IEnumerator RotateBetweenAngles(float shootInterval,float rotationTime,float minRotation,float maxRotation,bool startTowardsMax,
+        bool inRotation,bool shoot = true)
+    {
+        float bulletShot = -1f;
+
+        float halfPeriodTime = rotationTime * 0.5f;
+
+        while (true)
+        {
+            float fromRotation;
+            float toRotation;
+
+            if (startTowardsMax)
+            {
+                fromRotation = minRotation;
+                toRotation = maxRotation;
+            }
+            else
+            {
+                fromRotation = maxRotation;
+                toRotation = minRotation;
+            }
+
+            float currentRotation = transform.eulerAngles.z;
+            float movementTime = halfPeriodTime;
+
+            if (inRotation)
+            {
+                float totalDistance = Mathf.Abs(toRotation - fromRotation);
+                float remainingDistance = Mathf.Abs(toRotation - currentRotation);
+
+                movementTime *= remainingDistance / totalDistance;
+
+                fromRotation = currentRotation;
+                inRotation = false;
+            }
+
+            float elapsedTime = 0f;
+
+            while (elapsedTime < movementTime)
+            {
+                elapsedTime += Time.deltaTime;
+
+                float t = Mathf.Clamp01(elapsedTime / movementTime);
+
+                float currentAngle = Mathf.Lerp(
+                    fromRotation,
+                    toRotation,
+                    t);
+
+                transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+
+                if (shoot && bulletShot < 0f)
+                {
+                    ShootBullet(transform.up);
+                    bulletShot = shootInterval;
+                }
+
+                bulletShot -= Time.deltaTime;
+
+                yield return null;
+            }
+
+            transform.rotation = Quaternion.Euler(0f, 0f, toRotation);
+
+            startTowardsMax = !startTowardsMax;
+        }
     }
     #endregion
     #region SinWave
@@ -332,6 +397,10 @@ public class BossSection : MonoBehaviour
     public void SetLaserSO(LaserSO newLaserSO)
     {
         _laser.SetLaserSO(newLaserSO);
+    }
+    public LaserSO GetLaserSO()
+    {
+        return _laser.GetLaserSO();
     }
     public void StopLaser()
     {

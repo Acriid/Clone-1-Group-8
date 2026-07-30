@@ -110,4 +110,9 @@ public class Laser : MonoBehaviour
     {
         _laserSO = newLaserSO;
     }
+
+    internal LaserSO GetLaserSO()
+    {
+        return _laserSO;
+    }
 }
