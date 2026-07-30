@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 268a8b2975c2f0942a75e2b04737a9f8, type: 3}
-  m_Name: BossSettings
+  m_Name: BossSettings 1
   m_EditorClassIdentifier: Assembly-CSharp::BossSettingsSO
-  BossLevel: 1
+  BossLevel: 2
   ArenaPaddingPercentageX: 0.96
   ArenaPaddingPercentageY: 0.85
   BossHealth: 1929
@@ -30,13 +30,13 @@ MonoBehaviour:
   SpinningBulletTime: 3
   SpinningBulletShootTime: 0.5
   SpinningBulletRotateSpeed: 40
+  Phase2Offset: 2
+  TimeToMoveToPhase2: 3
   FourBulletAttackWait: 2
   FourBulletAttackTime: 0.1
   FourBulletOffset: 0
   FourBulletBulletAmount: 6
   FourBulletBulletRingAmount: 4
-  Phase2Offset: 2
-  TimeToMoveToPhase2: 3
   BulletSpreadAttackTime: 1.5
   BulletSpreadRotationDegrees: 51.42857
   BulletSpreadBulletAmount: 7

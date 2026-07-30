@@ -9,10 +9,6 @@ public class BossSection : MonoBehaviour
     private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
     [SerializeField] private BulletManager _positiveBulletManager;
     [SerializeField] private BulletManager _negativeBulletManager;
-    [SerializeField] private float _sectionSpeed = 1f;
-    
-
-    [SerializeField] private float _movementDistance = 2f;
     [SerializeField] private Laser _laser;
     //Temp Delete Later
     public SpriteRenderer SpriteRenderer;
@@ -116,17 +112,6 @@ public class BossSection : MonoBehaviour
     }
     #endregion
     #region Movement
-    public void MoveSection(Vector2 movePosition)
-    {
-        if(_moveRoutine != null)
-        {
-            StopCoroutine(_moveRoutine);
-            _moveRoutine = null;
-        }
-
-        _moveRoutine = StartCoroutine(MoveSectionEnumerator(movePosition));
-
-    }
     public void MoveSection(Vector2 movePosition, float timeToMove)
     {
         if(_moveRoutine != null)
@@ -138,25 +123,6 @@ public class BossSection : MonoBehaviour
         _moveRoutine = StartCoroutine(MoveSectionEnumerator(movePosition,timeToMove));
 
     }
-
-    private IEnumerator MoveSectionEnumerator(Vector2 movePosition)
-    {
-        float stoppingDistance = 0.001f;
-
-        while (Vector2.Distance(transform.position, movePosition) > stoppingDistance)
-        {
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                movePosition,
-                _sectionSpeed * Time.deltaTime);
-
-            yield return null;
-        }
-
-        transform.position = movePosition;
-        OnFinishedMove?.Invoke(this);
-    }
-
     private IEnumerator MoveSectionEnumerator(Vector2 movePosition, float moveTime)
     {
         Vector2 startPosition = transform.position;
@@ -212,9 +178,26 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
     }
+    private IEnumerator RotateOverTime(float shootInterval,float rotateSpeed,Quaternion finalRotation)
+    {
+        float bulletShot = -1f;
+        while(true)
+        {
+
+            transform.Rotate(0,0,rotateSpeed * Time.deltaTime);
+
+            if(bulletShot < 0)
+            {
+                ShootBullet(transform.up);
+                bulletShot = shootInterval;
+            }
+            bulletShot -= Time.deltaTime;
+            yield return null;
+        }
+    }
     #endregion
     #region SinWave
-    public void MoveSinWave(float shotSpeed,float bulletSpeed)
+    public void MoveSinWave(float shotSpeed,float bulletSpeed,float sectionSpeed,float movementDistance)
     {
         if(_sinRoutine != null)
         {
@@ -225,18 +208,18 @@ public class BossSection : MonoBehaviour
         else
         {
             _startPosition = transform.position;
-            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator());
+            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator(sectionSpeed,movementDistance));
             ShootBullet(shotSpeed,Vector2.left,bulletSpeed);
         }      
     }
 
-    private IEnumerator MoveSinWaveEnumerator()
+    private IEnumerator MoveSinWaveEnumerator(float sectionSpeed,float movementDistance)
     {
 
         float timeTracker = 0f;
         while (true)
         {
-            float movementOffset = -Mathf.Sin(timeTracker * _sectionSpeed) * _movementDistance;
+            float movementOffset = -Mathf.Sin(timeTracker * sectionSpeed) * movementDistance;
 
             transform.position = _startPosition + Vector2.up * movementOffset;
 

@@ -128,7 +128,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 28794995}
-  - component: {fileID: 28794994}
   - component: {fileID: 28794996}
   m_Layer: 0
   m_Name: Test Section Move 1
@@ -137,24 +136,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &28794994
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 28794993}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de7f3d92fe093dc4d809e442f81c7dd0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TestSectionMove
-  BossBrain: {fileID: 28794996}
-  TestLaser: {fileID: 0}
-  speed: 100
-  _sectionSpeed: 4
-  _movementDistance: 2
-  _phaseOffset: 0
 --- !u!4 &28794995
 Transform:
   m_ObjectHideFlags: 0
@@ -189,7 +170,8 @@ MonoBehaviour:
   _sectionsParent: {fileID: 1911772270}
   _negativeSection: {fileID: 1548018183}
   _positiveSection: {fileID: 1763710633}
-  _bossSettingsSO: {fileID: 11400000, guid: 833dfda0aa0703e49bffabf130b1dcd8, type: 2}
+  _bossSettingsSO: {fileID: 11400000, guid: 59d1eb1d1043fe14a85bc07413a07eff, type: 2}
+  _lvl9BossSettingsSO: {fileID: 0}
   _sectionList:
   - {fileID: 1278032023}
   - {fileID: 267718533}
@@ -369,9 +351,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 267718536}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 267718538}
+  SpriteRenderer: {fileID: 0}
 --- !u!212 &267718534
 SpriteRenderer:
   serializedVersion: 3
@@ -666,9 +647,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 587785391}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 587785393}
+  SpriteRenderer: {fileID: 0}
 --- !u!212 &587785389
 SpriteRenderer:
   serializedVersion: 3
@@ -1047,7 +1027,7 @@ Transform:
   m_GameObject: {fileID: 588681019}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24, y: -14.2, z: 0}
+  m_LocalPosition: {x: 24.9, y: 13.8, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1088,9 +1068,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 787718564}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 787718566}
+  SpriteRenderer: {fileID: 0}
 --- !u!212 &787718562
 SpriteRenderer:
   serializedVersion: 3
@@ -1476,9 +1455,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1278032026}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 1278032028}
+  SpriteRenderer: {fileID: 0}
 --- !u!212 &1278032024
 SpriteRenderer:
   serializedVersion: 3
@@ -1738,9 +1716,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1548018182}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 1
-  _movementDistance: 2
   _laser: {fileID: 0}
+  SpriteRenderer: {fileID: 0}
 --- !u!4 &1548018184
 Transform:
   m_ObjectHideFlags: 0
@@ -1802,9 +1779,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1763710632}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 1
-  _movementDistance: 2
   _laser: {fileID: 0}
+  SpriteRenderer: {fileID: 0}
 --- !u!4 &1763710634
 Transform:
   m_ObjectHideFlags: 0
@@ -1885,9 +1861,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 0}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 1
-  _movementDistance: 2
   _laser: {fileID: 0}
+  SpriteRenderer: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

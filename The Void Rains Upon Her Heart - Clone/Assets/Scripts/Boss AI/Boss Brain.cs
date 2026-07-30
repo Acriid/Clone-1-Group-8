@@ -14,6 +14,7 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private BossSection _negativeSection;
     [SerializeField] private BossSection _positiveSection;
     [SerializeField] private BossSettingsSO _bossSettingsSO;
+    [SerializeField] private BossSettingsLVL9SO _lvl9BossSettingsSO;
     private BoundsInt _leftArenaBounds;
     [SerializeField] private List<BossSection> _sectionList = new(4);
 
@@ -56,6 +57,7 @@ public class BossBrain : MonoBehaviour
     //FourBullets = 0
     //BulletSpread = 1
     private int _previousAttack = -1;
+    private int _bossLevel = 0;
     private event Action _onAttackDone;
     void Start()
     {
@@ -67,6 +69,7 @@ public class BossBrain : MonoBehaviour
             new Vector3Int(_arenaBounds.xMin, _arenaBounds.yMin, _arenaBounds.zMin),
             new Vector3Int(splitX - _arenaBounds.xMin, _arenaBounds.size.y, _arenaBounds.size.z));
 
+        _bossLevel = _bossSettingsSO.BossLevel;
 
         _onAttackDone += SendAttack;
         _onAttackDone?.Invoke();
@@ -241,6 +244,59 @@ public class BossBrain : MonoBehaviour
             StartCoroutine(FourBulletAttack(_bossSettingsSO.FourBulletAttackTime,_bossSettingsSO.FourBulletAttackWait));
         }
     }
+    #region  SendAttack
+    private void SendAttack()
+    {
+        StartCoroutine(WaitBeforeAttack());
+    }
+    private IEnumerator WaitBeforeAttack()
+    {
+        yield return new WaitForSeconds(_bossSettingsSO.AttackDelay);
+
+        SendPhase1Attack();
+    }
+
+    private void SendPhase1Attack()
+    {
+        ResetSection();
+        //Level 1 attacks
+        if(_bossLevel == 1)
+        {
+            int randomAttack = Random.Range(0,4);
+            while(randomAttack == _previousAttack)
+            {
+                randomAttack = Random.Range(0,4);
+            }
+
+            if(randomAttack == 0)
+            {
+                StartSinAttack();
+            }
+            else if(randomAttack == 1)
+            {
+                StartXLaserAttack();
+            }
+            else if(randomAttack == 2)
+            {
+                StartLineLaserAttack();
+            }
+            else if(randomAttack == 3)
+            {
+                StartSpinningBulletAttack();
+            } 
+        }
+        else
+        {
+            // int randomAttack = Random.Range(0,1);
+            // while(randomAttack == _previousAttack)
+            // {
+            //     randomAttack = Random.Range(0,1);
+            // }
+            RotatingLaserAttack();
+        }
+    }
+    #endregion
+    #region Level 2 Attacks
     private IEnumerator FourBulletAttack(float shotWaitTime,float negativeWaitTime)
     {
         int bulletAmount = _bossSettingsSO.FourBulletBulletAmount;
@@ -311,45 +367,6 @@ public class BossBrain : MonoBehaviour
 
         _previousAttack = 1;
         _onAttackDone?.Invoke(); 
-    }
-    private void SendAttack()
-    {
-        StartCoroutine(WaitBeforeAttack());
-    }
-    private IEnumerator WaitBeforeAttack()
-    {
-        yield return new WaitForSeconds(_bossSettingsSO.AttackDelay);
-
-        SendPhase1Attack();
-    }
-
-    private void SendPhase1Attack()
-    {
-        ResetSection();
-        int randomAttack = Random.Range(0,4);
-        while(randomAttack == _previousAttack)
-        {
-            randomAttack = Random.Range(0,4);
-        }
-
-        if(randomAttack == 0)
-        {
-            StartSinAttack();
-
-        }
-        else if(randomAttack == 1)
-        {
-            StartXLaserAttack();
-
-        }
-        else if(randomAttack == 2)
-        {
-            StartLineLaserAttack();
-        }
-        else if(randomAttack == 3)
-        {
-            StartSpinningBulletAttack();
-        }
     }
     private void StartSpinningBulletAttack()
     {
@@ -429,9 +446,11 @@ public class BossBrain : MonoBehaviour
 
     private void StartLineLaserAttack()
     {
-        float yOffset = 2 *_arenaBounds.yMax / 5;
+        //Uses the SinWave move distance to have the sections be in the same starting spots for both attacks.
+        float firstYPosition = _arenaBounds.yMax - _bossSettingsSO.SinMovementDistance - 1f;
+        float yOffset = 2f * firstYPosition/3f;
         float xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
-        Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset);
+        Vector2 movePosition = new(xPosition, firstYPosition);
 
         foreach(BossSection bossSection in _sectionList)
         {
@@ -500,7 +519,7 @@ public class BossBrain : MonoBehaviour
     {
         PutIntoSections();
         float xPosition = _arenaBounds.xMin * _bossSettingsSO.ArenaPaddingPercentageX;
-        float yPosition = _arenaBounds.yMax * _bossSettingsSO.ArenaPaddingPercentageX;
+        float yPosition = _arenaBounds.yMax * _bossSettingsSO.ArenaPaddingPercentageY;
         Vector2 sectionPosition = new(xPosition,yPosition);
         
         foreach(BossSection bossSection in _section1)
@@ -575,9 +594,10 @@ public class BossBrain : MonoBehaviour
     }
     private void StartSinAttack()
     {
-        float yOffset = 2 *_arenaBounds.yMax / 5;
+        float firstPositionYPosition = _arenaBounds.yMax - _bossSettingsSO.SinMovementDistance - 1f;
+        float yOffset = 2f*firstPositionYPosition/3f;
         float xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
-        Vector2 movePosition = new(xPosition, _arenaBounds.yMax - yOffset );
+        Vector2 movePosition = new(xPosition, firstPositionYPosition);
 
         foreach(BossSection bossSection in _sectionList)
         {
@@ -610,19 +630,64 @@ public class BossBrain : MonoBehaviour
     {
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSinWave(_bossSettingsSO.SinShotSpeed,_bossSettingsSO.SinWaveBulletSpeed);
+            bossSection.MoveSinWave(_bossSettingsSO.SinShotSpeed,_bossSettingsSO.SinWaveBulletSpeed,
+            _bossSettingsSO.SinSectionSpeed,_bossSettingsSO.SinMovementDistance);
         }
         yield return new WaitForSeconds(_bossSettingsSO.SinWaveAttackTime);
         foreach(BossSection bossSection in _sectionList)
         {
-            bossSection.MoveSinWave(_bossSettingsSO.SinShotSpeed,_bossSettingsSO.SinWaveBulletSpeed);
+            bossSection.MoveSinWave(_bossSettingsSO.SinShotSpeed,_bossSettingsSO.SinWaveBulletSpeed,
+            _bossSettingsSO.SinSectionSpeed,_bossSettingsSO.SinMovementDistance);
         }
 
         _previousAttack = 0;
         _onAttackDone?.Invoke();
     }
+    #endregion
+    #region Level 9 Attacks
+    private void RotatingLaserAttack()
+    {
+        float xPosition = _leftArenaBounds.xMin / 3;
+        
 
+        Vector2 movePosition = new(xPosition,0f);
 
+        List<BossSection> _bulletSectionList = new(_sectionList);
+        BossSection laserSection = _bulletSectionList[Random.Range(0,_bulletSectionList.Count)];
+        _bulletSectionList.Remove(laserSection);
+
+        laserSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+        laserSection.OnFinishedMove += CheckIfCanRotatingLaserAttack;
+
+        xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
+        float yOffset = _arenaBounds.yMax /2f;
+        movePosition = new(xPosition,yOffset);
+
+        foreach(BossSection bossSection in _bulletSectionList)
+        {
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanRotatingLaserAttack;
+            movePosition.y -= yOffset;
+        }
+    }
+    private void CheckIfCanRotatingLaserAttack(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CheckIfCanRotatingLaserAttack;
+        _sectionsFinishedMoving[_sectionList.IndexOf(bossSection)] = true;
+
+        //Check if all finished moving
+        foreach(bool booleans in _sectionsFinishedMoving)
+        {
+            if(!booleans) return;
+        }
+
+        //Reset Movement
+        for(int i = 0; i < _sectionsFinishedMoving.Count ; i++)
+        {
+            _sectionsFinishedMoving[i] = false;
+        }
+    }
+    #endregion
 
     private void PutIntoSections()
     {

@@ -9,6 +9,7 @@ public class BossSettingsSO : ScriptableObject
     [Range(1,2)]
     public int BossLevel = 1;
     public float ArenaPaddingPercentageX = 96f/100f;
+    public float ArenaPaddingPercentageY = 92f/100f;
     public float BossHealth = 1929;
     public float SectionHealthPhase1 = 349;
     public float SectionHealthPhase2 = 97;
@@ -22,24 +23,24 @@ public class BossSettingsSO : ScriptableObject
     public float SinWaveAttackTime = 6.5f;
     public float SinShotSpeed = 0.2f;
     public float SinWaveBulletSpeed = 10f;
+    public float SinSectionSpeed = 1f;
+    public float SinMovementDistance = 2f;
     [Header("SpinningBullet Attack")]
     public float SpinningBulletTime = 3f;
     public float SpinningBulletShootTime = 0.5f;
     public float SpinningBulletRotateSpeed = 40f;
     [Header("Phase 2")]
+    public float Phase2Offset = 2f;
+    public float TimeToMoveToPhase2 = 3f;
     [Header("FourBullet Attack")]
     public float FourBulletAttackWait = 2f;
     public float FourBulletAttackTime = 0.1f;
     public float FourBulletOffset = 0f;
     public int FourBulletBulletAmount = 6;
     public int FourBulletBulletRingAmount = 4;
-    [Header("Phase2")]
-    public float Phase2Offset = 2f;
-    public float TimeToMoveToPhase2 = 3f;
     [Header("BulletSpreadAttack")]
     public float BulletSpreadAttackTime = 1.5f;
     public float BulletSpreadRotationDegrees = 360f/7f;
     public int BulletSpreadBulletAmount = 7;
     public int BulletSpreadBulletCircleAmount = 4;
-
 }
