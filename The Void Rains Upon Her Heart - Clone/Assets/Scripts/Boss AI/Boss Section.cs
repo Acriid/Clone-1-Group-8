@@ -228,67 +228,51 @@ public class BossSection : MonoBehaviour
     {
         float bulletShot = -1f;
 
-        float halfPeriodTime = rotationTime * 0.5f;
+        float midRotation = (minRotation + maxRotation) * 0.5f;
+        float amplitude = (maxRotation - minRotation) * 0.5f;
+        float angularSpeed = 2f * Mathf.PI / rotationTime;
+
+        float phase;
+
+        if (inRotation)
+        {
+            //Resuming mid-swing: solve for the phase that matches where we currently are.
+            float currentRotation = transform.eulerAngles.z;
+            float normalized = Mathf.Clamp((currentRotation - midRotation) / amplitude, -1f, 1f);
+            float asinValue = Mathf.Asin(normalized);
+
+            //startTowardsMax tells us which half of the wave we're travelling through,
+            //since Asin alone can't distinguish the two.
+            phase = startTowardsMax ? asinValue : Mathf.PI - asinValue;
+        }
+        else
+        {
+            //minRotation sits at sin = -1 (phase = -pi/2), maxRotation sits at sin = 1 (phase = pi/2).
+            phase = startTowardsMax ? -Mathf.PI * 0.5f : Mathf.PI * 0.5f;
+        }
 
         while (true)
         {
-            float fromRotation;
-            float toRotation;
+            phase += angularSpeed * Time.deltaTime;
 
-            if (startTowardsMax)
+            //Keep phase bounded so it doesn't lose float precision over a long-running loop.
+            if (phase > Mathf.PI * 2f)
             {
-                fromRotation = minRotation;
-                toRotation = maxRotation;
-            }
-            else
-            {
-                fromRotation = maxRotation;
-                toRotation = minRotation;
+                phase -= Mathf.PI * 2f;
             }
 
-            float currentRotation = transform.eulerAngles.z;
-            float movementTime = halfPeriodTime;
+            float currentAngle = midRotation + amplitude * Mathf.Sin(phase);
+            transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
 
-            if (inRotation)
+            if (shoot && bulletShot < 0f)
             {
-                float totalDistance = Mathf.Abs(toRotation - fromRotation);
-                float remainingDistance = Mathf.Abs(toRotation - currentRotation);
-
-                movementTime *= remainingDistance / totalDistance;
-
-                fromRotation = currentRotation;
-                inRotation = false;
+                ShootBullet(transform.up);
+                bulletShot = shootInterval;
             }
 
-            float elapsedTime = 0f;
+            bulletShot -= Time.deltaTime;
 
-            while (elapsedTime < movementTime)
-            {
-                elapsedTime += Time.deltaTime;
-
-                float t = Mathf.Clamp01(elapsedTime / movementTime);
-
-                float currentAngle = Mathf.Lerp(
-                    fromRotation,
-                    toRotation,
-                    t);
-
-                transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
-
-                if (shoot && bulletShot < 0f)
-                {
-                    ShootBullet(transform.up);
-                    bulletShot = shootInterval;
-                }
-
-                bulletShot -= Time.deltaTime;
-
-                yield return null;
-            }
-
-            transform.rotation = Quaternion.Euler(0f, 0f, toRotation);
-
-            startTowardsMax = !startTowardsMax;
+            yield return null;
         }
     }
     #endregion
