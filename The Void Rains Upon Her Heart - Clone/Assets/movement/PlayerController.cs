@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private BulletManager bulletManager;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 0.15f;
-    
+     
     private Rigidbody2D rb;
     private Camera mainCamera;
     
@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviour
         {
             StartDash();
         }
+
     }
     
     void GetAimDirection()
