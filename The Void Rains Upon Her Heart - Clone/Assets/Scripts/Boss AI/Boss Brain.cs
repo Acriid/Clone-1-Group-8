@@ -645,6 +645,7 @@ public class BossBrain : MonoBehaviour
     }
     #endregion
     #region Level 9 Attacks
+    #region  RotatingLaser
     private void RotatingLaserAttack()
     {
         float xPosition = _leftArenaBounds.xMin / 3;
@@ -687,8 +688,18 @@ public class BossBrain : MonoBehaviour
             _sectionsFinishedMoving[i] = false;
         }
     }
+    //Rotates an exact 360
+    private void RotateLaser()
+    {
+        
+    }
     #endregion
-
+    #endregion
+    private void RotateSection(BossSection bossSection, Quaternion pointToRotateTo,float timeToRotate,
+    float shootInterval, bool shoot = true)
+    {
+        bossSection.RotateAndShoot(shootInterval,timeToRotate,pointToRotateTo,shoot);
+    }
     private void PutIntoSections()
     {
         List<BossSection> randomList = new(_sectionList);

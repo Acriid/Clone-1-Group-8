@@ -7,4 +7,5 @@ public class BossSettingsLVL9SO : ScriptableObject
     [Header("SpinningLaserAttack")]
     public float SpinningLaserRotationSpeed = 4f;
     public float SpinningLaserBackAndForthSpeed = 10f;
+    public float SpinningLaserBulletShotSpeed = 1f/3f;
 }

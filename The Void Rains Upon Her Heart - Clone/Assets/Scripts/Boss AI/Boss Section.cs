@@ -151,6 +151,10 @@ public class BossSection : MonoBehaviour
     {
         _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotateSpeed));
     }
+    public void RotateAndShoot(float shootInterval,float rotationTime, Quaternion rotation,bool clockwise = false,bool shoot = true)
+    {
+        _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotationTime,rotation,clockwise,shoot));
+    }
 
     public void RotateAndShoot()
     {
@@ -178,22 +182,49 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
     }
-    private IEnumerator RotateOverTime(float shootInterval,float rotateSpeed,Quaternion finalRotation)
+    private IEnumerator RotateOverTime(float shootInterval,float rotationTime,Quaternion finalRotation,bool clockwise = false, bool shoot = true)
     {
         float bulletShot = -1f;
-        while(true)
+
+        float startAngle = transform.eulerAngles.z;
+        float targetAngle = finalRotation.eulerAngles.z;
+
+        float angleDifference;
+
+        if (clockwise)
         {
+            angleDifference = Mathf.Repeat(startAngle - targetAngle, 360f);
+            angleDifference *= -1f;
+        }
+        else
+        {
+            angleDifference = Mathf.Repeat(targetAngle - startAngle, 360f);
+        }
 
-            transform.Rotate(0,0,rotateSpeed * Time.deltaTime);
+        float elapsedTime = 0f;
 
-            if(bulletShot < 0)
+        while (elapsedTime < rotationTime)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsedTime / rotationTime);
+
+            float currentAngle = startAngle + angleDifference * t;
+
+            transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+
+            if (shoot && bulletShot < 0f)
             {
                 ShootBullet(transform.up);
                 bulletShot = shootInterval;
             }
+
             bulletShot -= Time.deltaTime;
+
             yield return null;
         }
+
+        transform.rotation = finalRotation;
     }
     #endregion
     #region SinWave
