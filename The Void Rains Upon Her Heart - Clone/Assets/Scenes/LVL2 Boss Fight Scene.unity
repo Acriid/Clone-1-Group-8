@@ -247,11 +247,13 @@ MonoBehaviour:
   _arenaBounds:
     m_Position: {x: -24, y: -15, z: 0}
     m_Size: {x: 48, y: 30, z: 0}
-  _phase2LaserSO: {fileID: 11400000, guid: c48cb2e50dd9b4b45a1d6c47a4acfb1c, type: 2}
+  _phase2LaserSOLVL2: {fileID: 11400000, guid: c48cb2e50dd9b4b45a1d6c47a4acfb1c, type: 2}
+  _phase2LaserSOLVL9: {fileID: 0}
   _sectionsParent: {fileID: 1130661794}
   _negativeSection: {fileID: 1869951671}
   _positiveSection: {fileID: 474397631}
   _bossSettingsSO: {fileID: 11400000, guid: 833dfda0aa0703e49bffabf130b1dcd8, type: 2}
+  _lvl9BossSettingsSO: {fileID: 0}
   _sectionList:
   - {fileID: 1072440987}
   - {fileID: 375321791}
@@ -447,8 +449,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 375321790}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 375321789}
   SpriteRenderer: {fileID: 375321792}
 --- !u!212 &375321792
@@ -635,8 +635,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 474397630}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 1
-  _movementDistance: 2
   _laser: {fileID: 0}
   SpriteRenderer: {fileID: 0}
 --- !u!1 &643101466
@@ -1263,8 +1261,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1072440986}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 1072440985}
   SpriteRenderer: {fileID: 1072440988}
 --- !u!212 &1072440988
@@ -1457,8 +1453,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 0}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 1
-  _movementDistance: 2
   _laser: {fileID: 0}
   SpriteRenderer: {fileID: 0}
 --- !u!114 &1130661798
@@ -1883,8 +1877,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1358470279}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 1358470278}
   SpriteRenderer: {fileID: 1358470281}
 --- !u!212 &1358470281
@@ -2292,8 +2284,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1487182351}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 3
-  _movementDistance: 2
   _laser: {fileID: 1487182350}
   SpriteRenderer: {fileID: 1487182353}
 --- !u!212 &1487182353
@@ -2930,8 +2920,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossSection
   _positiveBulletManager: {fileID: 1869951670}
   _negativeBulletManager: {fileID: 0}
-  _sectionSpeed: 1
-  _movementDistance: 2
   _laser: {fileID: 0}
   SpriteRenderer: {fileID: 0}
 --- !u!1 &1938243002

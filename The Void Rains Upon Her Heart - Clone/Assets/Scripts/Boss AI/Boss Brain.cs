@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -89,7 +90,15 @@ public class BossBrain : MonoBehaviour
         {
             bossSection.OnSectionDestroyed += OnSectionBroken;
             bossSection.SetHealth(_bossSettingsSO.SectionHealthPhase1);
+
+            if(_bossSettingsSO.BossLevel == 2)
+            {
+                if(_phase2LaserSOLVL9 != null)
+                bossSection.SetLaserSO(_phase2LaserSOLVL9);
+            }
         }
+
+
         //TestPhase2();
         // StartCoroutine(GoPhase2AfterTime());
     }
@@ -324,11 +333,12 @@ public class BossBrain : MonoBehaviour
         }
         else
         {
-            int randomAttack = Random.Range(0,2);
+            int randomAttack = Random.Range(0,4);
             while(randomAttack == _previousAttack)
             {
-                randomAttack = Random.Range(0,2);
+                randomAttack = Random.Range(0,4);
             }
+
 
             if(randomAttack == 0)
             {
@@ -337,6 +347,14 @@ public class BossBrain : MonoBehaviour
             else if(randomAttack == 1)
             {
                 StartSin9WaveAttack();
+            }
+            else if(randomAttack == 2)
+            {
+                StartClosingLaserAttack();
+            }
+            else if (randomAttack == 3)
+            {
+                StartLaserLineBulletAttack();
             }
         }
     }
@@ -487,6 +505,21 @@ public class BossBrain : MonoBehaviour
         Vector2 movePosition = new(xPosition, firstYPosition);
 
         foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += onFinishedMove;
+            bossSection.transform.up = Vector2.left;
+            movePosition.y -= yOffset;
+        }
+    }
+    private void MoveSectionsToLaserLineStartPositions(Action<BossSection> onFinishedMove,List<BossSection> orderedMoveList)
+    {
+        float firstYPosition = _arenaBounds.yMax - _bossSettingsSO.SinMovementDistance - 1f;
+        float yOffset = 2f * firstYPosition/3f;
+        float xPosition = _arenaBounds.xMax * _bossSettingsSO.ArenaPaddingPercentageX;
+        Vector2 movePosition = new(xPosition, firstYPosition);
+
+        foreach(BossSection bossSection in orderedMoveList)
         {
             bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
             bossSection.OnFinishedMove += onFinishedMove;
@@ -648,7 +681,6 @@ public class BossBrain : MonoBehaviour
         
         RotateSection(_laserSection,360f,8f,0f,true,false);
         LaserSO originalLaser = _laserSection.GetLaserSO();
-        _laserSection.SetLaserSO(_phase2LaserSOLVL9);
         _laserSection.ShootLaser();
 
 
@@ -657,10 +689,6 @@ public class BossBrain : MonoBehaviour
         {
             bossSection.RotateBetweenAnglesAndShoot(_lvl9BossSettingsSO.SpinningLaserBulletShotSpeed,2f,60f,120f,true,true);
         }
-        
-
-
-
 
         yield return new WaitForSeconds(8f);
        
@@ -671,7 +699,6 @@ public class BossBrain : MonoBehaviour
 
 
         _laserSection.StopLaser();
-        _laserSection.SetLaserSO(originalLaser);
 
         _previousAttack = 0;
         _onAttackDone?.Invoke();
@@ -708,6 +735,129 @@ public class BossBrain : MonoBehaviour
         _onAttackDone?.Invoke();
     }
     #endregion
+    #region ClosingLaser Attack
+    private void StartClosingLaserAttack()
+    {
+        ResetSection();
+        PutIntoSections();
+
+        float yPosition = _arenaBounds.yMax * 96f/100f;
+        float xPosition = _arenaBounds.xMax * 96f/100f;
+        Vector2 movePosition = new(xPosition,yPosition);
+
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanClosingLaserAttack;
+            movePosition.x *= -1;
+
+            bossSection.transform.up = Vector2.down;
+        }
+
+        yPosition = 2f;
+        xPosition = _arenaBounds.xMax * 92f/100f;
+
+        movePosition = new(xPosition,yPosition);
+
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanClosingLaserAttack;    
+            movePosition.y *= -1;     
+
+            bossSection.transform.up = Vector2.left;
+        }
+
+    }
+    private void CheckIfCanClosingLaserAttack(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CheckIfCanClosingLaserAttack;
+        if(!AllSectionsFinishedMoving(bossSection)) return;
+
+        StartCoroutine(ClosingLaserAttack());
+    }
+    //Lasts for 10 seconds
+    private IEnumerator ClosingLaserAttack()
+    {
+        float yPosition = _arenaBounds.yMax * 96f/100f;
+        float xPosition = 2f;
+        Vector2 movePosition = new(xPosition,yPosition);
+
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.MoveSection(movePosition,10f);
+            bossSection.ShootLaser();
+            movePosition.x *= -1;
+        }
+
+        bool startGoingBottom = true;
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.RotateBetweenAnglesAndShoot(0.1f,2f,45f,45f + 90f,startGoingBottom,true);
+            startGoingBottom = false;
+        }
+        yield return new WaitForSeconds(10f);
+
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.StopLaser();
+        }  
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.RotateAndShoot();
+        }   
+
+        _previousAttack = 2;
+        _onAttackDone?.Invoke();  
+    }
+    #endregion
+    //Laser ends at 60*
+    private void StartLaserLineBulletAttack()
+    {
+        _laserSection = _sectionList[Random.Range(0,_sectionList.Count)];
+
+        List<BossSection> _moveList = new(_sectionList);
+        _moveList.Remove(_laserSection);
+        _moveList.Add(_laserSection);
+
+        MoveSectionsToLaserLineStartPositions(CheckIfCanStartLaserLineBulletAttack,_moveList);
+    }
+    private void CheckIfCanStartLaserLineBulletAttack(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CheckIfCanStartLaserLineBulletAttack;
+        if(!AllSectionsFinishedMoving(bossSection)) return;
+
+        StartCoroutine(LaserLineBulletAttack());
+    }
+    private IEnumerator LaserLineBulletAttack()
+    {
+        _laserSection.ShootLaser();
+        _laserSection.transform.up = Quaternion.Euler(0f,0f,-60f) * new Vector2(0f,1f);
+        RotateSection(_laserSection,145f,5f,0f,false,false);
+
+
+        foreach(BossSection bossSection in _sectionList)
+        {
+            if(bossSection == _laserSection) continue;
+
+            bossSection.RotateBetweenAnglesAndShoot(0.15f,2f,45f,45f + 90f,true,true);
+        }
+
+        yield return new WaitForSeconds(4f);
+
+        foreach(BossSection bossSection in _sectionList)
+        {
+            if(bossSection == _laserSection) continue;
+
+            bossSection.RotateAndShoot();
+        } 
+
+        yield return new WaitForSeconds(1f);
+        _laserSection.StopLaser();
+
+        _previousAttack = 3;
+        _onAttackDone?.Invoke();
+    }
     #endregion
     private void RotateSection(BossSection bossSection, float rotateAmount,float timeToRotate,
     float shootInterval,bool clockwise = false, bool shoot = true)
