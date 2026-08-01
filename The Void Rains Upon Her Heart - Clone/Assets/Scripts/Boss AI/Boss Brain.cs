@@ -811,7 +811,7 @@ public class BossBrain : MonoBehaviour
         _onAttackDone?.Invoke();  
     }
     #endregion
-    //Laser ends at 60*
+    #region LaserLineBullet Attack
     private void StartLaserLineBulletAttack()
     {
         _laserSection = _sectionList[Random.Range(0,_sectionList.Count)];
@@ -858,6 +858,45 @@ public class BossBrain : MonoBehaviour
         _previousAttack = 3;
         _onAttackDone?.Invoke();
     }
+    #endregion
+    #region StaticLaser Attack
+    private void StartStaticLaserAttack()
+    {
+        ResetSection();
+        PutIntoSections();
+
+        float xPosition = _arenaBounds.xMax * 94/100;
+        float yPosition = 2f;
+        Vector2 rotationPosition = Quaternion.Euler(0f,0f,45f) * Vector2.right;
+
+        Vector2 movePosition = new(xPosition,yPosition);
+
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanStaticLaserAttack;
+            bossSection.transform.up = rotationPosition;
+            rotationPosition.y *= -1;
+            movePosition.y *= -1;
+        }
+
+        movePosition.y = _arenaBounds.yMax * 94/100;
+        movePosition.x *= -1;
+        
+    }
+    private void CheckIfCanStaticLaserAttack(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CheckIfCanStaticLaserAttack;
+        if(!AllSectionsFinishedMoving(bossSection)) return;
+
+
+    }
+    private IEnumerator StaticLaserAttack()
+    {
+
+        yield return null;
+    }
+    #endregion
     #endregion
     private void RotateSection(BossSection bossSection, float rotateAmount,float timeToRotate,
     float shootInterval,bool clockwise = false, bool shoot = true)
