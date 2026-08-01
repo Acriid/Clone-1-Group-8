@@ -13,6 +13,7 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private LaserSO _phase2LaserSOLVL2;
     [SerializeField] private LaserSO _phase2LaserSOLVL9;
     [SerializeField] private GameObject _sectionsParent;
+    [SerializeField] private GameObject _sectionsCore;
     [SerializeField] private BossSection _negativeSection;
     [SerializeField] private BossSection _positiveSection;
     [SerializeField] private BossSettingsSO _bossSettingsSO;
@@ -97,8 +98,8 @@ public class BossBrain : MonoBehaviour
                 bossSection.SetLaserSO(_phase2LaserSOLVL9);
             }
         }
-        TestPhase2();
-        // StartCoroutine(GoPhase2AfterTime());
+        //TestPhase2();
+        //StartCoroutine(GoPhase2AfterTime());
     }
 
     void OnDisable()
@@ -122,7 +123,6 @@ public class BossBrain : MonoBehaviour
         foreach(BossSection bossSection in _sectionList)
         {
             bossSection.TESTDESTROYSECTION();
-            OnSectionBroken(bossSection);
         }
     }
     #endregion
@@ -146,7 +146,11 @@ public class BossBrain : MonoBehaviour
             bossSection1.IndicateDestroyed();
         }
         _onAttackDone -= SendAttack;
-        
+        if(_sectionsCore != null)
+        {
+            _sectionsCore.SetActive(true);
+            _sectionsCore.GetComponent<BossSection>().StartPhase2(Mathf.Infinity);   
+        }
         if(_bossLevel == 1)
         { 
             StartPhase2LVL2();
@@ -154,7 +158,6 @@ public class BossBrain : MonoBehaviour
         }
         else
         {
-            Debug.Log("WOW");
             StartPhase2LVL9();
             _onAttackDone += SendPhase2LVL9Attack;
         }
@@ -209,12 +212,10 @@ public class BossBrain : MonoBehaviour
         yield return new WaitForSeconds(_bossSettingsSO.AttackDelay);
         if(_previousAttack == 0)
         {
-            Debug.Log("Started BulletSpread");
             StartCoroutine(BulletSpreadAttackLVL9(_lvl9BossSettingsSO.BulletSpreadAttackTime));
         }
         else
         {
-            Debug.Log("Started FourBullet");
             StartCoroutine(FourBulletAttackLVL9(_lvl9BossSettingsSO.FourBulletAttackTime,_lvl9BossSettingsSO.FourBulletAttackWait));
         }
     }
@@ -1142,7 +1143,12 @@ public class BossBrain : MonoBehaviour
     }
     public List<BossSection> GetBossSections()
     {
-        return _sectionList;
+        List<BossSection> resultList = new(_sectionList);
+        if(_sectionsCore != null)
+        {
+            resultList.Add(_sectionsCore.GetComponent<BossSection>());
+        }
+        return resultList;
     }
     #endregion
 }
