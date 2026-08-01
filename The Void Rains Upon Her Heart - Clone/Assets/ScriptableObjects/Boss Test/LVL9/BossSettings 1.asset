@@ -19,7 +19,7 @@ MonoBehaviour:
   SectionHealthPhase1: 349
   SectionHealthPhase2: 97
   SectionsParentRotationSpeed: 20
-  BulletSectionRotationSpeed: 60
+  BulletSectionRotationSpeed: 120
   AttackDelay: 2
   TimeToMoveToAttackPosition: 2
   SinWaveAttackTime: 6.5

@@ -1701,8 +1701,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
-  _bulletPoolSize: 70
+  _bullet: {fileID: 7338214740492402017, guid: 65ee53f12459a6e4e93447a7e0aef7b7, type: 3}
+  _bulletPoolSize: 200
 --- !u!114 &1548018183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1764,8 +1764,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
-  _bulletPoolSize: 70
+  _bullet: {fileID: 7338214740492402017, guid: 65ee53f12459a6e4e93447a7e0aef7b7, type: 3}
+  _bulletPoolSize: 200
 --- !u!114 &1763710633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1806,8 +1806,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1911772271}
-  - component: {fileID: 1911772273}
-  - component: {fileID: 1911772272}
   m_Layer: 0
   m_Name: SectionParent
   m_TagString: Untagged
@@ -1834,36 +1832,6 @@ Transform:
   - {fileID: 787718563}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1911772272
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1911772270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
-  _bulletPoolSize: 50
---- !u!114 &1911772273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1911772270}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0775a26aeb46ea44928158e81af8edd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BossSection
-  _positiveBulletManager: {fileID: 0}
-  _negativeBulletManager: {fileID: 0}
-  _laser: {fileID: 0}
-  SpriteRenderer: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

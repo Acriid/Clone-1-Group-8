@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afcc9806cfa5521499ed5123375892b1, type: 3}
   m_Name: TestBossBulletLvl9
   m_EditorClassIdentifier: Assembly-CSharp::BulletSO
-  BulletSpeed: 7.5
+  BulletSpeed: 6.5
   BulletDamage: 4
   BulletLifetime: 6
   BouncyBullet: 0
