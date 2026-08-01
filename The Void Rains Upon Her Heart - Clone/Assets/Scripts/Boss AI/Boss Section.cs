@@ -6,13 +6,12 @@ using UnityEngine;
 
 public class BossSection : MonoBehaviour
 {
-
-    [SerializeField] private BulletManager _bulletManager;
-    [SerializeField] private float _sectionSpeed = 1f;
-    
-
-    [SerializeField] private float _movementDistance = 2f;
+    private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
+    [SerializeField] private BulletManager _positiveBulletManager;
+    [SerializeField] private BulletManager _negativeBulletManager;
     [SerializeField] private Laser _laser;
+    //Temp Delete Later
+    public SpriteRenderer SpriteRenderer;
 
     //Health for lvl 2 per section is 349
     //Health for lvl 2 for phase 2 is 97 per section
@@ -32,13 +31,9 @@ public class BossSection : MonoBehaviour
     private Coroutine _bulletRoutine = null;
     private Coroutine _rotateRoutine = null;
 
-    private List<Coroutine> _routineList = new(4)
-    {
-        null,
-        null,
-        null,
-        null
-    };
+    private bool _isPositive = true;
+
+    private int _currentPhase = 1;
     #region Damage
 
     public void Damage(float damage)
@@ -46,20 +41,43 @@ public class BossSection : MonoBehaviour
         if(_sectionDestroyed)
         {
             damage *= 0f;
+            if(SpriteRenderer.color != Color.red)
+            {
+                SpriteRenderer.color = Color.red;
+            }
         }
         else
         {
+            StartCoroutine(IndicateHit());
             _sectionHealth -= damage;
             if(_sectionHealth <= 0)
             {
+                
                 _sectionDestroyed = true;
                 OnSectionDestroyed?.Invoke(this);
+                SpriteRenderer.color = Color.red;
+
+                if(_currentPhase == 2)
+                gameObject.SetActive(false);
             }
         }
 
         OnBossDamage?.Invoke(damage);
     }
+    private IEnumerator IndicateHit()
+    {
+        SpriteRenderer.color = Color.gray;
+        yield return _waitForSeconds0_1;
+        SpriteRenderer.color = Color.white;
+    }
     #endregion
+    public void StartPhase2(float newHealth)
+    {
+        _sectionHealth = newHealth;
+        _currentPhase = 2;
+        SpriteRenderer.color = Color.white;
+        _sectionDestroyed = false;
+    }
     //DELETE LATER
     public void TESTDESTROYSECTION()
     {
@@ -67,7 +85,10 @@ public class BossSection : MonoBehaviour
         _sectionDestroyed = true;
         OnSectionDestroyed?.Invoke(this);
     }
-
+    public void IndicateDestroyed()
+    {
+        SpriteRenderer.color = Color.red;
+    }
     private void DestroySection()
     {
         //TODO - implement the sprite change
@@ -91,17 +112,6 @@ public class BossSection : MonoBehaviour
     }
     #endregion
     #region Movement
-    public void MoveSection(Vector2 movePosition)
-    {
-        if(_moveRoutine != null)
-        {
-            StopCoroutine(_moveRoutine);
-            _moveRoutine = null;
-        }
-
-        _moveRoutine = StartCoroutine(MoveSectionEnumerator(movePosition));
-
-    }
     public void MoveSection(Vector2 movePosition, float timeToMove)
     {
         if(_moveRoutine != null)
@@ -113,25 +123,6 @@ public class BossSection : MonoBehaviour
         _moveRoutine = StartCoroutine(MoveSectionEnumerator(movePosition,timeToMove));
 
     }
-
-    private IEnumerator MoveSectionEnumerator(Vector2 movePosition)
-    {
-        float stoppingDistance = 0.001f;
-
-        while (Vector2.Distance(transform.position, movePosition) > stoppingDistance)
-        {
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                movePosition,
-                _sectionSpeed * Time.deltaTime);
-
-            yield return null;
-        }
-
-        transform.position = movePosition;
-        OnFinishedMove?.Invoke(this);
-    }
-
     private IEnumerator MoveSectionEnumerator(Vector2 movePosition, float moveTime)
     {
         Vector2 startPosition = transform.position;
@@ -160,7 +151,15 @@ public class BossSection : MonoBehaviour
     {
         _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotateSpeed));
     }
-
+    public void RotateAndShoot(float shootInterval,float rotationTime, float rotateAmount,bool clockwise = false,bool shoot = true)
+    {
+        _rotateRoutine = StartCoroutine(RotateOverTime(shootInterval,rotationTime,rotateAmount,clockwise,shoot));
+    }
+    public void RotateBetweenAnglesAndShoot(float shootInterval,float rotationTime,float minRotation,float maxRotation,bool startTowardsMax,
+        bool inRotation,bool shoot = true)
+    {
+        _rotateRoutine = StartCoroutine(RotateBetweenAngles(shootInterval,rotationTime,minRotation,maxRotation,startTowardsMax,inRotation,shoot));
+    }
     public void RotateAndShoot()
     {
         if(_rotateRoutine != null)
@@ -187,31 +186,120 @@ public class BossSection : MonoBehaviour
             yield return null;
         }
     }
+    private IEnumerator RotateOverTime(float shootInterval,float rotationTime,float rotationAmount,bool clockwise = false, bool shoot = true)
+    {
+        float bulletShot = -1f;
+
+        float startAngle = transform.eulerAngles.z;
+        float targetAngle = clockwise
+            ? startAngle - rotationAmount
+            : startAngle + rotationAmount;
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < rotationTime)
+        {
+            elapsedTime += Time.deltaTime;
+
+            float t = Mathf.Clamp01(elapsedTime / rotationTime);
+
+            float currentAngle = Mathf.Lerp(
+                startAngle,
+                targetAngle,
+                t);
+
+            transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+
+            if (shoot && bulletShot < 0f)
+            {
+                ShootBullet(transform.up);
+                bulletShot = shootInterval;
+            }
+
+            bulletShot -= Time.deltaTime;
+
+            yield return null;
+        }
+
+        transform.rotation = Quaternion.Euler(0f, 0f, targetAngle);
+    }
+    private IEnumerator RotateBetweenAngles(float shootInterval,float rotationTime,float minRotation,float maxRotation,bool startTowardsMax,
+        bool inRotation,bool shoot = true)
+    {
+        float bulletShot = -1f;
+
+        float midRotation = (minRotation + maxRotation) * 0.5f;
+        float amplitude = (maxRotation - minRotation) * 0.5f;
+        float angularSpeed = 2f * Mathf.PI / rotationTime;
+
+        float phase;
+
+        if (inRotation)
+        {
+            //Resuming mid-swing: solve for the phase that matches where we currently are.
+            float currentRotation = transform.eulerAngles.z;
+            float normalized = Mathf.Clamp((currentRotation - midRotation) / amplitude, -1f, 1f);
+            float asinValue = Mathf.Asin(normalized);
+
+            //startTowardsMax tells us which half of the wave we're travelling through,
+            //since Asin alone can't distinguish the two.
+            phase = startTowardsMax ? asinValue : Mathf.PI - asinValue;
+        }
+        else
+        {
+            //minRotation sits at sin = -1 (phase = -pi/2), maxRotation sits at sin = 1 (phase = pi/2).
+            phase = startTowardsMax ? -Mathf.PI * 0.5f : Mathf.PI * 0.5f;
+        }
+
+        while (true)
+        {
+            phase += angularSpeed * Time.deltaTime;
+
+            //Keep phase bounded so it doesn't lose float precision over a long-running loop.
+            if (phase > Mathf.PI * 2f)
+            {
+                phase -= Mathf.PI * 2f;
+            }
+
+            float currentAngle = midRotation + amplitude * Mathf.Sin(phase);
+            transform.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+
+            if (shoot && bulletShot < 0f)
+            {
+                ShootBullet(transform.up);
+                bulletShot = shootInterval;
+            }
+
+            bulletShot -= Time.deltaTime;
+
+            yield return null;
+        }
+    }
     #endregion
     #region SinWave
-    public void MoveSinWave(float shotSpeed)
+    public void MoveSinWave(float shotSpeed,float bulletSpeed,float sectionSpeed,float movementDistance)
     {
         if(_sinRoutine != null)
         {
-            ShootBullet(shotSpeed,Vector2.left);
+            ShootBullet(shotSpeed,Vector2.left,bulletSpeed);
             StopCoroutine(_sinRoutine);
             _sinRoutine = null;
         }
         else
         {
             _startPosition = transform.position;
-            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator());
-            ShootBullet(shotSpeed,Vector2.left);
+            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator(sectionSpeed,movementDistance));
+            ShootBullet(shotSpeed,Vector2.left,bulletSpeed);
         }      
     }
 
-    private IEnumerator MoveSinWaveEnumerator()
+    private IEnumerator MoveSinWaveEnumerator(float sectionSpeed,float movementDistance)
     {
 
         float timeTracker = 0f;
         while (true)
         {
-            float movementOffset = -Mathf.Sin(timeTracker * _sectionSpeed) * _movementDistance;
+            float movementOffset = -Mathf.Sin(timeTracker * sectionSpeed) * movementDistance;
 
             transform.position = _startPosition + Vector2.up * movementOffset;
 
@@ -222,7 +310,7 @@ public class BossSection : MonoBehaviour
     }
     #endregion
     #region Shooting Bullets
-    public void ShootBullet(float shotSpeed, Vector2 shootDirection)
+    public void ShootBullet(float shotSpeed, Vector2 shootDirection,float bulletSpeed)
     {
         if(_bulletRoutine != null)
         {
@@ -231,17 +319,14 @@ public class BossSection : MonoBehaviour
         }
         else
         {
-            _bulletRoutine = StartCoroutine(ShootBullets(shotSpeed,shootDirection));
+            _bulletRoutine = StartCoroutine(ShootSinBullets(shotSpeed,shootDirection,bulletSpeed));
         }
     }
-    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount)
+    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount, BulletDirection direction, float offset)
     {
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Up,bulletAmount));
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Down,bulletAmount));
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Left,bulletAmount));
-        StartCoroutine(ShootBulletsFromDirection(shotSpeed,BulletDirection.Right,bulletAmount));
+        StartCoroutine(ShootBulletsFromDirection(shotSpeed,direction,bulletAmount,offset));
     }
-    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount)
+    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount,float offset)
     {
         
         WaitForSeconds waitTime = new(shotSpeed);
@@ -250,23 +335,42 @@ public class BossSection : MonoBehaviour
         while (bulletsShot < bulletAmount)
         {
             Vector2 dir = GetDirectionVector(direction);
+            dir = Quaternion.Euler(0f,0f,offset) * dir;
             ShootBullet(dir);
             bulletsShot++;
             yield return waitTime;
         }
     }
-    private IEnumerator ShootBullets(float shootSpeed, Vector2 shootDirection)
+    private IEnumerator ShootSinBullets(float shootSpeed, Vector2 shootDirection, float bulletSpeed)
     {
         WaitForSeconds waitTime = new(shootSpeed);
         while(true)
         {
-            ShootBullet(shootDirection);
+            ShootBullet(shootDirection,bulletSpeed);
             yield return waitTime;
         }
     }
     public void ShootBullet(Vector2 bulletDirection)
     {
-        _bulletManager.ShootBullet(transform.position,bulletDirection);
+        if(_isPositive)
+        {
+            _positiveBulletManager.ShootBullet(transform.position,bulletDirection);
+        }
+        else
+        {
+            _negativeBulletManager.ShootBullet(transform.position,bulletDirection);
+        }
+    }
+    public void ShootBullet(Vector2 bulletDirection, float bulletSpeed)
+    {
+        if(_isPositive)
+        {
+            _positiveBulletManager.ShootBullet(transform.position,bulletDirection,bulletSpeed);
+        }
+        else
+        {
+            _negativeBulletManager.ShootBullet(transform.position,bulletDirection,bulletSpeed);
+        }
     }
     #endregion
     #region Laser
@@ -277,6 +381,10 @@ public class BossSection : MonoBehaviour
     public void SetLaserSO(LaserSO newLaserSO)
     {
         _laser.SetLaserSO(newLaserSO);
+    }
+    public LaserSO GetLaserSO()
+    {
+        return _laser.GetLaserSO();
     }
     public void StopLaser()
     {
@@ -312,6 +420,10 @@ public class BossSection : MonoBehaviour
         Debug.Log($"Current Time: {hour}:{minute}:{second}:{milliseconds}");         
     }
 
+    public void SetHealth(float newHealth)
+    {
+        _sectionHealth = newHealth;
+    }
 }
 
 public enum BulletDirection { Up, Down, Left, Right }

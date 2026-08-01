@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestBossBullet 2
   m_EditorClassIdentifier: Assembly-CSharp::BulletSO
   BulletSpeed: 1.75
-  BulletDamage: 0
+  BulletDamage: 4
   BulletLifetime: 13
   BouncyBullet: 0
-  BossBullet: 0
+  BossBullet: 1

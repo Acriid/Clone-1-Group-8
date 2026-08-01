@@ -30,6 +30,7 @@ public class Laser : MonoBehaviour
     public void StopLaser()
     {
         StopAllCoroutines();
+        _laserLine.enabled = false;
     }
     private IEnumerator InitialLaserShot()
     {
@@ -79,6 +80,10 @@ public class Laser : MonoBehaviour
             Collider2D hit = Physics2D.OverlapBox(_laserMiddle,_laserSize,_laserAngle,_laserSO.PlayerMask);
             if(hit)
             {
+                if(hit.TryGetComponent<PlayerHealthManager>(out PlayerHealthManager component))
+                {
+                    component.TakeDamage(_laserSO.LaserDamage);
+                }
             }
 
             UpdateLaserPosition();
@@ -104,5 +109,10 @@ public class Laser : MonoBehaviour
     public void SetLaserSO(LaserSO newLaserSO)
     {
         _laserSO = newLaserSO;
+    }
+
+    internal LaserSO GetLaserSO()
+    {
+        return _laserSO;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class PlayerHealthManager : MonoBehaviour
 {
-    [SerializeField] private float _MaxHealth = 100f;
+    [SerializeField] private float _MaxHealth = 16f;
 
     private float _CurrentHealth;
 
@@ -13,22 +13,33 @@ public class PlayerHealthManager : MonoBehaviour
     
     [SerializeField] private Slider _HealthSlider;
 
-
-   
+    public SpriteRenderer SpriteRenderer;
+   private float _invincibilityAfterHitTime = 1f;
+   private float _invincibilityCooldown = 1f;
     // sets current health at start to the players max health
     private void Awake()
     {
         _CurrentHealth = _MaxHealth;
-        _HealthSlider.maxValue = _MaxHealth;
-        _HealthSlider.value = _CurrentHealth;
+        // _HealthSlider.maxValue = _MaxHealth;
+        // _HealthSlider.value = _CurrentHealth;
     }
-
+    void Update()
+    {
+        //TEMP
+        _invincibilityCooldown -= Time.deltaTime;
+        if(_invincibilityCooldown <= 0)
+        {
+            SpriteRenderer.color = Color.red;
+        }
+        //TEMP
+    }
     // used by bullet script to damage the player
     public void TakeDamage(float damage)
     {
+        if(_invincibilityCooldown >0) return;
         _CurrentHealth -= damage;
         _CurrentHealth = Mathf.Clamp(_CurrentHealth, 0, _MaxHealth); //makes sure current health doesnt fall below 0
-        _HealthSlider.value = _CurrentHealth; // update UI
+        //_HealthSlider.value = _CurrentHealth; // update UI
 
         Debug.Log($"Player Health: {_CurrentHealth}");
 
@@ -36,6 +47,9 @@ public class PlayerHealthManager : MonoBehaviour
         {
             PlayerDeath();
         }
+
+        _invincibilityCooldown = _invincibilityAfterHitTime;
+        SpriteRenderer.color = Color.white;
     }
 
     private void PlayerDeath()

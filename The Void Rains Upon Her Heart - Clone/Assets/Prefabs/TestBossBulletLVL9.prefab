@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4014227141891865798}
   - component: {fileID: 7721700157958497539}
   m_Layer: 3
-  m_Name: TestBossBullet
+  m_Name: TestBossBulletLVL9
   m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0b5207f325e44f4584dbcd67118c21d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
-  _bulletSO: {fileID: 11400000, guid: 6af665af92f43d54e92bc840f22dd476, type: 2}
+  _bulletSO: {fileID: 11400000, guid: e247a2e9504f6d446809d25746cb19df, type: 2}
   _bulletRigidBody: {fileID: 251632221749375292}
 --- !u!58 &7721700157958497539
 CircleCollider2D:

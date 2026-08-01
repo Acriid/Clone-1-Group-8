@@ -32,13 +32,23 @@ public class Bullet : MonoBehaviour
             StopDespawnRoutine();
             OnBulletRemoved?.Invoke(this);
         }
-        else if(_bulletSO.BossBullet && collision.collider.CompareTag("Boss"))
+        else if(!_bulletSO.BossBullet && collision.collider.CompareTag("Boss"))
         {
-            //TODO - Damage the boss
+            if(collision.collider.TryGetComponent<BossSection>(out BossSection component))
+            {
+                component.Damage(_bulletSO.BulletDamage);
+                OnBulletRemoved?.Invoke(this);
+                StopDespawnRoutine();
+            }
         }
         else if(collision.collider.CompareTag("Player"))
         {
-            //TODO - Damage the player
+            if(collision.collider.TryGetComponent<PlayerHealthManager>(out PlayerHealthManager component))
+            {
+                component.TakeDamage(_bulletSO.BulletDamage);
+                OnBulletRemoved?.Invoke(this);
+                StopDespawnRoutine();
+            }
         }
 
     }
@@ -68,6 +78,34 @@ public class Bullet : MonoBehaviour
         gameObject.transform.right = bulletDirection;
 
         _bulletRigidBody.AddForce(gameObject.transform.right * _bulletSO.BulletSpeed * BULLETSPEEDOFFSET);
+
+    }
+    public void Shoot(Vector2 spawnPoint, Vector2 bulletDirection,float speedToUse)
+    {
+        if(_bulletSO == null)
+        {
+            Debug.LogError("Bullet ScriptableObject is not set");
+            return;
+        }
+        if(_bulletRigidBody == null)
+        {
+            Debug.LogError("Bullet RigidBody is not set");
+            return;           
+        }
+        
+        if(_despawnRoutine != null)
+        {
+            Debug.LogWarning("Attempting to shoot a bullet that was already shot");
+            return;
+        }
+
+        _despawnRoutine = StartCoroutine(DespawnBullet());
+
+        //Set position and rotation
+        gameObject.transform.position = spawnPoint;
+        gameObject.transform.right = bulletDirection;
+
+        _bulletRigidBody.AddForce(gameObject.transform.right * speedToUse * BULLETSPEEDOFFSET);
 
     }
     private IEnumerator DespawnBullet()
