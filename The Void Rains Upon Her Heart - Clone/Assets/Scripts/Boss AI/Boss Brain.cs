@@ -13,6 +13,7 @@ public class BossBrain : MonoBehaviour
     [SerializeField] private LaserSO _phase2LaserSOLVL2;
     [SerializeField] private LaserSO _phase2LaserSOLVL9;
     [SerializeField] private GameObject _sectionsParent;
+    [SerializeField] private GameObject _sectionsCore;
     [SerializeField] private BossSection _negativeSection;
     [SerializeField] private BossSection _positiveSection;
     [SerializeField] private BossSettingsSO _bossSettingsSO;
@@ -63,7 +64,7 @@ public class BossBrain : MonoBehaviour
     private event Action _onAttackDone;
 
 
-
+    private bool _alreadyCalled = false;
     private BossSection _laserSection = null;
     private List<BossSection> _bulletSections = new(3)
     {
@@ -97,10 +98,8 @@ public class BossBrain : MonoBehaviour
                 bossSection.SetLaserSO(_phase2LaserSOLVL9);
             }
         }
-
-
         //TestPhase2();
-        // StartCoroutine(GoPhase2AfterTime());
+        //StartCoroutine(GoPhase2AfterTime());
     }
 
     void OnDisable()
@@ -124,12 +123,12 @@ public class BossBrain : MonoBehaviour
         foreach(BossSection bossSection in _sectionList)
         {
             bossSection.TESTDESTROYSECTION();
-            OnSectionBroken(bossSection);
         }
     }
     #endregion
     private void OnSectionBroken(BossSection bossSection)
     {
+        if(_alreadyCalled) return;
         bossSection.OnSectionDestroyed -= OnSectionBroken;
         _sectionsBroken[_sectionList.IndexOf(bossSection)] = true;
 
@@ -138,7 +137,8 @@ public class BossBrain : MonoBehaviour
         {
             if(!booleans) return;
         }
-
+        
+        _alreadyCalled = true;
         foreach(BossSection bossSection1 in _sectionList)
         {
             bossSection1.StopLaser();
@@ -146,12 +146,164 @@ public class BossBrain : MonoBehaviour
             bossSection1.IndicateDestroyed();
         }
         _onAttackDone -= SendAttack;
-        _onAttackDone += SendPhase2Attack;
-        StartPhase2();
+        if(_sectionsCore != null)
+        {
+            _sectionsCore.SetActive(true);
+            _sectionsCore.GetComponent<BossSection>().StartPhase2(Mathf.Infinity);   
+        }
+        if(_bossLevel == 1)
+        { 
+            StartPhase2LVL2();
+            _onAttackDone += SendPhase2Attack;
+        }
+        else
+        {
+            StartPhase2LVL9();
+            _onAttackDone += SendPhase2LVL9Attack;
+        }
         StopAllCoroutines();
     }
+    private void StartPhase2LVL9()
+    {
+        Vector2 initialRotation = Vector2.up;
+        Vector2 initialPosition = new(0f,2f);
 
-    private void StartPhase2()
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.MoveSection(initialPosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.transform.up = initialRotation;
+            bossSection.OnFinishedMove += CanStartPhase2LVL9Attacks;
+            bossSection.OnSectionDestroyed += StopLaser;
+
+            initialPosition = Quaternion.Euler(0f,0f,-90f) * initialPosition;
+            initialRotation = Quaternion.Euler(0f,0f,-90f) * initialRotation;
+        }
+    }
+    private void CanStartPhase2LVL9Attacks(BossSection bossSection)
+    {
+        bossSection.OnFinishedMove -= CanStartPhase2LVL9Attacks;
+        if(!AllSectionsFinishedMoving(bossSection)) return;
+
+        foreach(BossSection bossSection1 in _sectionList)
+        {
+            bossSection1.StartPhase2(_bossSettingsSO.SectionHealthPhase2);
+        }
+
+        StartPhase2LVL9Attacks();
+        StartCoroutine(RotateSections());       
+    }
+    private void StartPhase2LVL9Attacks()
+    {
+
+        foreach(BossSection bossSection in _sectionList)
+        {
+            bossSection.SetLaserSO(_phase2LaserSOLVL9);
+            bossSection.ShootLaser();
+        }
+        _previousAttack = Random.Range(0,2);
+        SendPhase2LVL9Attack();
+    }
+    private void SendPhase2LVL9Attack()
+    {
+        StartCoroutine(WaitBeforePhase2LVL9Attack());
+    }
+    private IEnumerator WaitBeforePhase2LVL9Attack()
+    {
+        yield return new WaitForSeconds(_bossSettingsSO.AttackDelay);
+        if(_previousAttack == 0)
+        {
+            StartCoroutine(BulletSpreadAttackLVL9(_lvl9BossSettingsSO.BulletSpreadAttackTime));
+        }
+        else
+        {
+            StartCoroutine(FourBulletAttackLVL9(_lvl9BossSettingsSO.FourBulletAttackTime,_lvl9BossSettingsSO.FourBulletAttackWait));
+        }
+    }
+    //19 bullets total
+    private IEnumerator BulletSpreadAttackLVL9(float timeBetweenAttacks)
+    {
+        float phaseOffset = _lvl9BossSettingsSO.BulletSpreadRotationDegrees/2f;
+        for (int i = 0; i < _lvl9BossSettingsSO.BulletSpreadBulletCircleAmount; i++)
+        {
+            Vector2 originalShootDirection = Vector2.right;
+            if (i % 2 == 0)
+            {
+                for(int j = 0 ; j < _lvl9BossSettingsSO.BulletSpreadBulletAmount ; j++)
+                {
+                    _positiveSection.ShootBullet(originalShootDirection);
+                    originalShootDirection = Quaternion.Euler(0f,0f,_lvl9BossSettingsSO.BulletSpreadRotationDegrees) 
+                    * originalShootDirection;
+                }
+            }
+            else
+            {
+                originalShootDirection = Quaternion.Euler(0f,0f,phaseOffset) * originalShootDirection;
+                for(int j = 0 ; j < _lvl9BossSettingsSO.BulletSpreadBulletAmount ; j++)
+                {
+                    _negativeSection.ShootBullet(originalShootDirection);
+                    originalShootDirection = Quaternion.Euler(0f,0f,_lvl9BossSettingsSO.BulletSpreadRotationDegrees) 
+                    * originalShootDirection;
+                }
+            }
+
+            if (i < _lvl9BossSettingsSO.BulletSpreadBulletCircleAmount - 1)
+            {
+                yield return new WaitForSeconds(timeBetweenAttacks);
+            }    
+        }  
+
+        _previousAttack = 1;
+        _onAttackDone?.Invoke(); 
+    }
+    private IEnumerator FourBulletAttackLVL9(float shotWaitTime,float negativeWaitTime)
+    {
+        int bulletAmount = _lvl9BossSettingsSO.FourBulletBulletAmount;
+        for (int i = 0; i < _lvl9BossSettingsSO.FourBulletBulletRingAmount; i++)
+        {
+            if (i % 2 == 0)
+            {
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Up);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Down);
+
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Left,-_lvl9BossSettingsSO.FourBulletOffset);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Left,_lvl9BossSettingsSO.FourBulletOffset);
+
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Right,_lvl9BossSettingsSO.FourBulletOffset);
+                _positiveSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Right,-_lvl9BossSettingsSO.FourBulletOffset);
+            }
+            else
+            {
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Up);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Down);
+                
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Left,-_lvl9BossSettingsSO.FourBulletOffset);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Left,_lvl9BossSettingsSO.FourBulletOffset);
+
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Right,_lvl9BossSettingsSO.FourBulletOffset);
+                _negativeSection.Phase2ShootFourDirections(shotWaitTime, bulletAmount,
+                BulletDirection.Right,-_lvl9BossSettingsSO.FourBulletOffset);
+            }
+
+            if (i < _lvl9BossSettingsSO.FourBulletBulletRingAmount - 1)
+            {
+                yield return new WaitForSeconds(negativeWaitTime);
+            }
+        }
+        _previousAttack = 0;
+        _onAttackDone?.Invoke();
+    }
+    private void StartPhase2LVL2()
     {
         ResetSection();
         PutIntoSections();
@@ -333,12 +485,11 @@ public class BossBrain : MonoBehaviour
         }
         else
         {
-            int randomAttack = Random.Range(0,4);
+            int randomAttack = Random.Range(0,5);
             while(randomAttack == _previousAttack)
             {
-                randomAttack = Random.Range(0,4);
+                randomAttack = Random.Range(0,5);
             }
-
 
             if(randomAttack == 0)
             {
@@ -355,6 +506,10 @@ public class BossBrain : MonoBehaviour
             else if (randomAttack == 3)
             {
                 StartLaserLineBulletAttack();
+            }
+            else if (randomAttack == 4)
+            {
+                StartStaticLaserAttack();
             }
         }
     }
@@ -865,9 +1020,9 @@ public class BossBrain : MonoBehaviour
         ResetSection();
         PutIntoSections();
 
-        float xPosition = _arenaBounds.xMax * 94/100;
+        float xPosition = _arenaBounds.xMax * 96/100;
         float yPosition = 2f;
-        Vector2 rotationPosition = Quaternion.Euler(0f,0f,45f) * Vector2.right;
+        Vector2 rotationPosition = Quaternion.Euler(0f,0f,-20f) * Vector2.left;
 
         Vector2 movePosition = new(xPosition,yPosition);
 
@@ -883,21 +1038,64 @@ public class BossBrain : MonoBehaviour
         movePosition.y = _arenaBounds.yMax * 94/100;
         movePosition.x *= -1;
         
+
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
+            bossSection.OnFinishedMove += CheckIfCanStaticLaserAttack;
+            bossSection.transform.up = Vector2.right;
+            movePosition.y *= -1;
+        }
     }
     private void CheckIfCanStaticLaserAttack(BossSection bossSection)
     {
         bossSection.OnFinishedMove -= CheckIfCanStaticLaserAttack;
         if(!AllSectionsFinishedMoving(bossSection)) return;
 
-
+        StartCoroutine(StaticLaserAttack());
     }
     private IEnumerator StaticLaserAttack()
     {
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.ShootLaser();
+        }
 
-        yield return null;
+        Vector2 position1 = Vector2.left;
+        Vector2 position2 = Vector2.left;
+        bool startNegative = true;
+        foreach(BossSection bossSection in _section2)
+        {
+
+            position1 = bossSection.transform.position;
+            position2 = position1;
+            position2.y *= -1;
+
+            bossSection.MoveSinWave(_lvl9BossSettingsSO.StaticLaserAttackShotSpeed,_lvl9BossSettingsSO.StaticLaserAttackBulletSpeed
+            ,_lvl9BossSettingsSO.StaticLaserAttackSectionSpeed,position1,position2,Vector2.right,startNegative);
+            startNegative = false;
+        }
+
+
+
+        yield return new WaitForSeconds(6f);
+        foreach(BossSection bossSection in _section1)
+        {
+            bossSection.StopLaser();
+        }
+        yield return new WaitForSeconds(1f);
+
+        foreach(BossSection bossSection in _section2)
+        {
+            bossSection.MoveSinWave(_lvl9BossSettingsSO.StaticLaserAttackShotSpeed,_lvl9BossSettingsSO.StaticLaserAttackBulletSpeed
+            ,_lvl9BossSettingsSO.StaticLaserAttackSectionSpeed,position1,position2,Vector2.right,startNegative);
+        }
+        _previousAttack = 4;
+        _onAttackDone?.Invoke();
     }
     #endregion
     #endregion
+    #region Helper Functions
     private void RotateSection(BossSection bossSection, float rotateAmount,float timeToRotate,
     float shootInterval,bool clockwise = false, bool shoot = true)
     {
@@ -945,6 +1143,12 @@ public class BossBrain : MonoBehaviour
     }
     public List<BossSection> GetBossSections()
     {
-        return _sectionList;
+        List<BossSection> resultList = new(_sectionList);
+        if(_sectionsCore != null)
+        {
+            resultList.Add(_sectionsCore.GetComponent<BossSection>());
+        }
+        return resultList;
     }
+    #endregion
 }

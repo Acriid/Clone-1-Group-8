@@ -75,6 +75,7 @@ public class BossSection : MonoBehaviour
     {
         _sectionHealth = newHealth;
         _currentPhase = 2;
+        if(SpriteRenderer != null)
         SpriteRenderer.color = Color.white;
         _sectionDestroyed = false;
     }
@@ -87,6 +88,7 @@ public class BossSection : MonoBehaviour
     }
     public void IndicateDestroyed()
     {
+        if(SpriteRenderer != null)
         SpriteRenderer.color = Color.red;
     }
     private void DestroySection()
@@ -277,7 +279,7 @@ public class BossSection : MonoBehaviour
     }
     #endregion
     #region SinWave
-    public void MoveSinWave(float shotSpeed,float bulletSpeed,float sectionSpeed,float movementDistance)
+    public void MoveSinWave(float shotSpeed,float bulletSpeed,float sectionSpeed,float movementDistance,bool negative = true)
     {
         if(_sinRoutine != null)
         {
@@ -288,21 +290,67 @@ public class BossSection : MonoBehaviour
         else
         {
             _startPosition = transform.position;
-            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator(sectionSpeed,movementDistance));
+            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator(sectionSpeed,movementDistance,negative));
             ShootBullet(shotSpeed,Vector2.left,bulletSpeed);
         }      
     }
-
-    private IEnumerator MoveSinWaveEnumerator(float sectionSpeed,float movementDistance)
+    private IEnumerator MoveSinWaveEnumerator(float sectionSpeed,float movementDistance,bool negative = true)
     {
-
+        int negativeInt = 1;
+        if(negative) negativeInt = -1;
         float timeTracker = 0f;
         while (true)
         {
-            float movementOffset = -Mathf.Sin(timeTracker * sectionSpeed) * movementDistance;
+            float movementOffset = Mathf.Sin(timeTracker * sectionSpeed) * movementDistance * negativeInt;
 
             transform.position = _startPosition + Vector2.up * movementOffset;
 
+
+            timeTracker += Time.deltaTime;
+            yield return null;
+        }
+    }
+    public void MoveSinWave(float shotSpeed,float bulletSpeed,float sectionSpeed,Vector2 pointA,Vector2 pointB,Vector2 bulletDirection,bool negative = true)
+    {
+        if(_sinRoutine != null)
+        {
+            ShootBullet(shotSpeed,bulletDirection,bulletSpeed);
+            StopCoroutine(_sinRoutine);
+            _sinRoutine = null;
+        }
+        else
+        {
+            Vector2 middlePoint = (pointA + pointB) * 0.5f;
+            Vector2 currentPoint = transform.position;
+
+            _sinRoutine = StartCoroutine(MoveSinWaveEnumerator(sectionSpeed,pointA,pointB,middlePoint,currentPoint,negative));
+            ShootBullet(shotSpeed,bulletDirection,bulletSpeed);
+        }      
+    }
+    private IEnumerator MoveSinWaveEnumerator(float sectionSpeed,Vector2 pointA,Vector2 pointB,Vector2 middlePoint,Vector2 currentPoint,bool negative = true)
+    {
+        int negativeInt = 1;
+        if(negative) negativeInt = -1;
+
+        Vector2 direction = (pointB - middlePoint).normalized;
+        float amplitude = Vector2.Distance(middlePoint,pointB);
+
+        //Work out how far along the wave currentPoint already sits, so movement continues
+        //smoothly from here instead of snapping back as if it started at middlePoint.
+        float displacement = Vector2.Dot(currentPoint - middlePoint,direction);
+        float normalizedDisplacement = amplitude > 0f
+            ? Mathf.Clamp((displacement / amplitude) * negativeInt,-1f,1f)
+            : 0f;
+
+        float timeTracker = (amplitude > 0f && sectionSpeed != 0f)
+            ? Mathf.Asin(normalizedDisplacement) / sectionSpeed
+            : 0f;
+
+        while (true)
+        {
+            float movementOffset = Mathf.Sin(timeTracker * sectionSpeed) * amplitude * negativeInt;
+
+            transform.position = middlePoint + direction * movementOffset;
 
             timeTracker += Time.deltaTime;
             yield return null;
@@ -322,11 +370,11 @@ public class BossSection : MonoBehaviour
             _bulletRoutine = StartCoroutine(ShootSinBullets(shotSpeed,shootDirection,bulletSpeed));
         }
     }
-    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount, BulletDirection direction, float offset)
+    public void Phase2ShootFourDirections(float shotSpeed, int bulletAmount, BulletDirection direction, float offset = 0f)
     {
         StartCoroutine(ShootBulletsFromDirection(shotSpeed,direction,bulletAmount,offset));
     }
-    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount,float offset)
+    public IEnumerator ShootBulletsFromDirection(float shotSpeed, BulletDirection direction, int bulletAmount,float offset = 0f)
     {
         
         WaitForSeconds waitTime = new(shotSpeed);

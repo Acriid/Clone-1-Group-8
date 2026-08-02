@@ -17,3 +17,15 @@ MonoBehaviour:
   SpinningLaserBulletShotSpeed: 0.33333334
   SinWaveAttackTime: 8
   SinWaveShotInterval: 0.1
+  StaticLaserAttackSectionSpeed: 2
+  StaticLaserAttackShotSpeed: 0.17
+  StaticLaserAttackBulletSpeed: 5.6
+  BulletSpreadAttackTime: 1
+  BulletSpreadRotationDegrees: 18.947369
+  BulletSpreadBulletAmount: 19
+  BulletSpreadBulletCircleAmount: 6
+  FourBulletAttackWait: 2
+  FourBulletAttackTime: 0.1
+  FourBulletOffset: 30
+  FourBulletBulletAmount: 6
+  FourBulletBulletRingAmount: 4
