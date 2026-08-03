@@ -258,11 +258,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 8
+  focusSpeed: 1.2
   dashSpeed: 4
   dashDuration: 0
   bulletManager: {fileID: 836611316}
   firePoint: {fileID: 264858416}
   fireRate: 0.15
+  focusFOV: 50
+  normalFOV: 60
+  fovTransitionSpeed: 10
 --- !u!50 &706564395
 Rigidbody2D:
   serializedVersion: 5
