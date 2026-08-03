@@ -19,6 +19,7 @@ public class PlayerHealthManager : MonoBehaviour
     public SpriteRenderer SpriteRenderer;
    private float _invincibilityAfterHitTime = 1f;
    private float _invincibilityCooldown = 1f;
+    public bool IsInvulnerable;
 
     // sets current health at start to the players max health
     private void Awake()
@@ -28,6 +29,7 @@ public class PlayerHealthManager : MonoBehaviour
         _HealthSlider.value = _CurrentHealth;
         _DamageSlider.maxValue = _MaxHealth;
         _DamageSlider.value = _CurrentHealth;
+        IsInvulnerable = false;
     }
     void Update()
     {
@@ -43,6 +45,7 @@ public class PlayerHealthManager : MonoBehaviour
     public void TakeDamage(float damage)
     {
         if(_invincibilityCooldown >0) return;
+        if (IsInvulnerable) return;
         _CurrentHealth -= damage;
         _CurrentHealth = Mathf.Clamp(_CurrentHealth, 0, _MaxHealth); //makes sure current health doesnt fall below 0
 
