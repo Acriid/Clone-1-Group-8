@@ -1,9 +1,10 @@
- using UnityEngine;
+  using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float focusSpeed = 2.5f; // Slower speed when focusing
     [SerializeField] private float dashSpeed = 12f;
     [SerializeField] private float dashDuration = 0.15f;
     
@@ -11,6 +12,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private BulletManager bulletManager;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float fireRate = 0.15f;
+    
+    [Header("Focus Settings")]
+    [SerializeField] private float focusFOV = 50f; // Optional: zoom in when focusing
+    [SerializeField] private float normalFOV = 60f;
+    [SerializeField] private float fovTransitionSpeed = 10f;
     
     private Rigidbody2D rb;
     private Camera mainCamera;
@@ -26,13 +32,22 @@ public class PlayerController : MonoBehaviour
     private float fireCooldown;
     private bool isFiring;
     
+    private bool isFocusing;
+    private float targetFOV;
+    private Camera camComponent;
+    
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
-        //Cursor.lockState = CursorLockMode.Confined;
+        camComponent = mainCamera.GetComponent<Camera>();
+        Cursor.lockState = CursorLockMode.Confined;
         
-        // Quick sanity checks so I know if something's missing
+        // Set initial FOV
+        targetFOV = normalFOV;
+        camComponent.fieldOfView = normalFOV;
+        
+        // Quick sanity checks
         if (bulletManager == null)
             Debug.LogWarning("BulletManager not assigned on " + gameObject.name);
         if (firePoint == null)
@@ -45,6 +60,8 @@ public class PlayerController : MonoBehaviour
         GetAimDirection();
         HandleShooting();
         HandleDashTiming();
+        HandleFocus();
+        HandleFOVTransition();
     }
     
     void FixedUpdate()
@@ -54,17 +71,19 @@ public class PlayerController : MonoBehaviour
     
     void GetMovementInput()
     {
-        // WASD or arrow keys, your choice
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         
         moveInput = new Vector2(horizontal, vertical);
         
-        // Stops you from moving faster diagonally
         if (moveInput.magnitude > 1f)
             moveInput.Normalize();
         
-        // Dash only works if you're actually moving
+        // Check for focus mode (hold Shift)
+        isFocusing = Input.GetKey(KeyCode.LeftShift) && !isDashing;
+        
+        // Dash only works if you're moving and press Shift
+        // Using GetKeyDown for dash activation (tap Shift)
         if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing && moveInput != Vector2.zero)
         {
             StartDash();
@@ -73,25 +92,19 @@ public class PlayerController : MonoBehaviour
     
     void GetAimDirection()
     {
-        // Where's the mouse in the game world?
         mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        
-        // Direction from player to mouse
         Vector2 direction = (mousePos - (Vector2)transform.position).normalized;
         aimDirection = direction;
         
-        // Spin the player to face the mouse
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
     }
     
     void HandleShooting()
     {
-        // Cooldown counting
         if (fireCooldown > 0)
             fireCooldown -= Time.deltaTime;
         
-        // Hold left click for auto-fire
         isFiring = Input.GetMouseButton(0);
         
         if (isFiring && fireCooldown <= 0)
@@ -100,7 +113,6 @@ public class PlayerController : MonoBehaviour
             fireCooldown = fireRate;
         }
         
-        // Single click also works (catches the first frame of clicking)
         if (Input.GetMouseButtonDown(0) && fireCooldown <= 0)
         {
             FireBullet();
@@ -110,7 +122,6 @@ public class PlayerController : MonoBehaviour
     
     void FireBullet()
     {
-        // Don't crash if someone forgot to set things up
         if (bulletManager == null || firePoint == null)
             return;
         
@@ -127,7 +138,7 @@ public class PlayerController : MonoBehaviour
         if (dashTimer <= 0f)
         {
             isDashing = false;
-            rb.gravityScale = 1f; // Turn gravity back on if you had it off
+            rb.gravityScale = 1f;
         }
     }
     
@@ -136,7 +147,37 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         dashTimer = dashDuration;
         dashDirection = moveInput.normalized;
-        rb.gravityScale = 0f; // Turn off gravity so you dash smoothly
+        rb.gravityScale = 0f;
+    }
+    
+    void HandleFocus()
+    {
+        // You can add focus-specific effects here
+        // For example: slower fire rate, more accuracy, damage boost, etc.
+        if (isFocusing)
+        {
+            // Optional: Reduce fire rate when focusing (uncomment if desired)
+            // fireRate = 0.1f; // Faster shooting while focused
+        }
+    }
+    
+    void HandleFOVTransition()
+    {
+        // Smoothly transition FOV when focusing/unfocusing
+        if (isFocusing && !isDashing)
+        {
+            targetFOV = focusFOV;
+        }
+        else
+        {
+            targetFOV = normalFOV;
+        }
+        
+        camComponent.fieldOfView = Mathf.Lerp(
+            camComponent.fieldOfView, 
+            targetFOV, 
+            fovTransitionSpeed * Time.deltaTime
+        );
     }
     
     void MovePlayer()
@@ -145,13 +186,17 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity = dashDirection * dashSpeed;
         }
+        else if (isFocusing && moveInput != Vector2.zero)
+        {
+            // Focus mode: slower movement
+            rb.linearVelocity = moveInput * focusSpeed;
+        }
         else
         {
             rb.linearVelocity = moveInput * moveSpeed;
         }
     }
     
-    // Shows where bullets come from in the editor - helpful for setup
     void OnDrawGizmosSelected()
     {
         if (firePoint != null)
