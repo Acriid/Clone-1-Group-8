@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4014227141891865798}
   - component: {fileID: 7721700157958497539}
   m_Layer: 3
-  m_Name: TestBossBulletLVL9
+  m_Name: PositiveLVL2Phase2Bullet
   m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: -5759092256760982727, guid: eeea60571e7c3214c9990c110fc7480f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0b5207f325e44f4584dbcd67118c21d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
-  _bulletSO: {fileID: 11400000, guid: e247a2e9504f6d446809d25746cb19df, type: 2}
+  _bulletSO: {fileID: 11400000, guid: 0b9ac2acc10004c48a878636b2201f21, type: 2}
   _bulletRigidBody: {fileID: 251632221749375292}
 --- !u!58 &7721700157958497539
 CircleCollider2D:

@@ -41,7 +41,6 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
         camComponent = mainCamera.GetComponent<Camera>();
-        Cursor.lockState = CursorLockMode.Confined;
         
         // Set initial FOV
         targetFOV = normalFOV;
@@ -138,7 +137,6 @@ public class PlayerController : MonoBehaviour
         if (dashTimer <= 0f)
         {
             isDashing = false;
-            rb.gravityScale = 1f;
         }
     }
     

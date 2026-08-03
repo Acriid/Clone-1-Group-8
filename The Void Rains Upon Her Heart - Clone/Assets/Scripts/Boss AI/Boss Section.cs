@@ -7,9 +7,17 @@ using UnityEngine;
 public class BossSection : MonoBehaviour
 {
     private static WaitForSeconds _waitForSeconds0_1 = new WaitForSeconds(0.1f);
+    [SerializeField] private Collider2D _collider;
     [SerializeField] private BulletManager _positiveBulletManager;
     [SerializeField] private BulletManager _negativeBulletManager;
     [SerializeField] private Laser _laser;
+    [SerializeField] private Sprite _brokenSpritePositive;
+    [SerializeField] private Sprite _brokenSpriteNegative;
+    [SerializeField] private Sprite _brokenSpritePositivePhase2;
+    [SerializeField] private Sprite _brokenSpriteNegativePhase2;
+
+    [SerializeField] private Sprite _spritePositive;
+    [SerializeField] private Sprite _spriteNegative;
     //Temp Delete Later
     public SpriteRenderer SpriteRenderer;
 
@@ -41,10 +49,11 @@ public class BossSection : MonoBehaviour
         if(_sectionDestroyed)
         {
             damage *= 0f;
-            if(SpriteRenderer.color != Color.red)
+            if(SpriteRenderer.sprite != _brokenSpritePositive || SpriteRenderer.sprite != _brokenSpriteNegative)
             {
-                SpriteRenderer.color = Color.red;
+                ChangePositiveOrNegative(_isPositive);
             }
+
         }
         else
         {
@@ -55,14 +64,52 @@ public class BossSection : MonoBehaviour
                 
                 _sectionDestroyed = true;
                 OnSectionDestroyed?.Invoke(this);
-                SpriteRenderer.color = Color.red;
-
-                if(_currentPhase == 2)
-                gameObject.SetActive(false);
+                
+                ChangePositiveOrNegative(_isPositive);
             }
         }
 
         OnBossDamage?.Invoke(damage);
+    }
+    public void ChangePositiveOrNegative(bool isPositive)
+    {
+        _isPositive = isPositive;
+        if(_sectionDestroyed && _currentPhase == 2)
+        {
+            _collider.enabled = false;
+            if(_isPositive)
+            {
+                SpriteRenderer.sprite = _brokenSpritePositivePhase2;
+            }
+            else
+            {
+                SpriteRenderer.sprite = _brokenSpriteNegativePhase2;
+            }
+            return;
+        }
+        if(_isPositive)
+        {
+            if(_laser != null)
+            _laser.ChangeLaserColour(Color.red);
+
+            SpriteRenderer.sprite = _spritePositive;
+            if(_sectionDestroyed)
+            {
+                SpriteRenderer.sprite = _brokenSpritePositive;
+            }
+        }
+        else
+        {
+            if(_laser != null)
+            _laser.ChangeLaserColour(Color.blue);
+
+            SpriteRenderer.sprite = _spriteNegative;
+            if(_sectionDestroyed)
+            {
+                SpriteRenderer.sprite = _brokenSpriteNegative;
+            }         
+        }
+        
     }
     private IEnumerator IndicateHit()
     {
@@ -78,6 +125,9 @@ public class BossSection : MonoBehaviour
         if(SpriteRenderer != null)
         SpriteRenderer.color = Color.white;
         _sectionDestroyed = false;
+
+        _isPositive = true;
+        ChangePositiveOrNegative(_isPositive);
     }
     //DELETE LATER
     public void TESTDESTROYSECTION()
@@ -88,8 +138,7 @@ public class BossSection : MonoBehaviour
     }
     public void IndicateDestroyed()
     {
-        if(SpriteRenderer != null)
-        SpriteRenderer.color = Color.red;
+        ChangePositiveOrNegative(_isPositive);
     }
     private void DestroySection()
     {

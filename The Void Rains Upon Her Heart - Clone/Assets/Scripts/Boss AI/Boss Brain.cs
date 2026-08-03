@@ -598,6 +598,9 @@ public class BossBrain : MonoBehaviour
     {
 
         PutIntoSections();
+
+        bool positive = Random.Range(0,2) == 1;
+
         float yPosition = _arenaBounds.yMax / 2;
         float xPosition = _arenaBounds.xMin * 2/3;
         float rotationOffset = 30f;
@@ -615,6 +618,7 @@ public class BossBrain : MonoBehaviour
 
             sectionPosition.y *= -1;
         }
+        ChangeSectionsColour(_section1,!positive);
 
         sectionRotation = Quaternion.Euler(0,0,-rotationOffset) * Vector2.left;
 
@@ -631,6 +635,7 @@ public class BossBrain : MonoBehaviour
 
             sectionPosition.y *= -1;
         }
+        ChangeSectionsColour(_section2,positive);
     }
 
     private void CheckIfCanSpinningBulletAttack(BossSection bossSection)
@@ -692,6 +697,10 @@ public class BossBrain : MonoBehaviour
     }
     private void StartLineLaserAttack()
     {
+        bool positive = Random.Range(0,2) == 1;
+
+        ChangeSectionsColour(_sectionList,positive);
+
         MoveSectionsToLaserLineStartPositions(CheckIfCanLineLaserAttack);
     }
     private void CheckIfCanLineLaserAttack(BossSection bossSection)
@@ -719,6 +728,10 @@ public class BossBrain : MonoBehaviour
     private void StartXLaserAttack()
     {
         PutIntoSections();
+
+        bool positive = Random.Range(0,2) == 1;
+        ChangeSectionsColour(_sectionList,positive);
+
         float xPosition = _arenaBounds.xMin * _bossSettingsSO.ArenaPaddingPercentageX;
         float yPosition = _arenaBounds.yMax * _bossSettingsSO.ArenaPaddingPercentageY;
         Vector2 sectionPosition = new(xPosition,yPosition);
@@ -730,6 +743,7 @@ public class BossBrain : MonoBehaviour
             bossSection.transform.up = Vector2.right;
             sectionPosition.y *= -1;
         }
+        
 
         sectionPosition.x *= -1;
         sectionPosition.y = yPosition / 4f;
@@ -740,6 +754,7 @@ public class BossBrain : MonoBehaviour
             bossSection.transform.up = Vector2.left;
             sectionPosition.y *= -1;
         }
+
     }
     private void CheckIfCanXLaserAttack(BossSection bossSection)
     {
@@ -774,6 +789,10 @@ public class BossBrain : MonoBehaviour
     }
     private void StartSinAttack()
     {
+        bool positive = Random.Range(0,2) == 1;
+
+        ChangeSectionsColour(_sectionList,positive);
+
         MoveSectionsToLaserLineStartPositions(CheckIfCanSinAttack);
     }
     private void CheckIfCanSinAttack(BossSection bossSection)
@@ -810,9 +829,13 @@ public class BossBrain : MonoBehaviour
 
         Vector2 movePosition = new(xPosition,0f);
 
+        bool positive = Random.Range(0,2) == 1;
+
         _bulletSections = new(_sectionList);
         _laserSection = _bulletSections[Random.Range(0,_bulletSections.Count)];
         _bulletSections.Remove(_laserSection);
+
+        ChangeSectionsColour(_laserSection,positive);
 
         _laserSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
         _laserSection.transform.up = Quaternion.Euler(0f,0f,rotationOffset) * new Vector3(0f,1f,0f);
@@ -830,6 +853,7 @@ public class BossBrain : MonoBehaviour
             bossSection.transform.up = Vector2.left;
             movePosition.y -= yOffset;
         }
+        ChangeSectionsColour(_bulletSections,!positive);
     }
     private void CheckIfCanRotatingLaserAttack(BossSection bossSection)
     {
@@ -871,6 +895,10 @@ public class BossBrain : MonoBehaviour
     #region SinWaveLVL9
     private void StartSin9WaveAttack()
     {
+        bool positive = Random.Range(0,2) == 1;
+
+        ChangeSectionsColour(_sectionList,positive);
+
         MoveSectionsToLaserLineStartPositions(CheckIfCanSin9Attack);
     }
     private void CheckIfCanSin9Attack(BossSection bossSection)
@@ -904,6 +932,10 @@ public class BossBrain : MonoBehaviour
         ResetSection();
         PutIntoSections();
 
+        bool positive = Random.Range(0,2) == 1;
+
+        
+
         float yPosition = _arenaBounds.yMax * 96f/100f;
         float xPosition = _arenaBounds.xMax * 96f/100f;
         Vector2 movePosition = new(xPosition,yPosition);
@@ -916,6 +948,7 @@ public class BossBrain : MonoBehaviour
 
             bossSection.transform.up = Vector2.down;
         }
+        ChangeSectionsColour(_section1,positive);
 
         yPosition = 2f;
         xPosition = _arenaBounds.xMax * 92f/100f;
@@ -930,6 +963,7 @@ public class BossBrain : MonoBehaviour
 
             bossSection.transform.up = Vector2.left;
         }
+        ChangeSectionsColour(_section1,!positive);
 
     }
     private void CheckIfCanClosingLaserAttack(BossSection bossSection)
@@ -979,10 +1013,15 @@ public class BossBrain : MonoBehaviour
     {
         _laserSection = _sectionList[Random.Range(0,_sectionList.Count)];
 
+        bool positive = Random.Range(0,2) == 1;
+
+        ChangeSectionsColour(_laserSection,positive);
+
         List<BossSection> _moveList = new(_sectionList);
         _moveList.Remove(_laserSection);
         _moveList.Add(_laserSection);
 
+        ChangeSectionsColour(_moveList,!positive);
         MoveSectionsToLaserLineStartPositions(CheckIfCanStartLaserLineBulletAttack,_moveList);
     }
     private void CheckIfCanStartLaserLineBulletAttack(BossSection bossSection)
@@ -1034,6 +1073,8 @@ public class BossBrain : MonoBehaviour
 
         Vector2 movePosition = new(xPosition,yPosition);
 
+        bool positive = Random.Range(0,2) == 1;
+
         foreach(BossSection bossSection in _section1)
         {
             bossSection.MoveSection(movePosition,_bossSettingsSO.TimeToMoveToAttackPosition);
@@ -1042,6 +1083,7 @@ public class BossBrain : MonoBehaviour
             rotationPosition.y *= -1;
             movePosition.y *= -1;
         }
+        ChangeSectionsColour(_section1,positive);
 
         movePosition.y = _arenaBounds.yMax * 94/100;
         movePosition.x *= -1;
@@ -1054,6 +1096,7 @@ public class BossBrain : MonoBehaviour
             bossSection.transform.up = Vector2.right;
             movePosition.y *= -1;
         }
+        ChangeSectionsColour(_section2,!positive);
     }
     private void CheckIfCanStaticLaserAttack(BossSection bossSection)
     {
@@ -1157,6 +1200,19 @@ public class BossBrain : MonoBehaviour
             resultList.Add(_sectionsCore.GetComponent<BossSection>());
         }
         return resultList;
+    }
+    public void ChangeSectionsColour(List<BossSection> sectionsList, bool positive)
+    {
+        foreach(BossSection bossSection in sectionsList)
+        {
+            bossSection.ChangePositiveOrNegative(positive);
+        }
+    }
+    public void ChangeSectionsColour(BossSection section, bool positive)
+    {
+
+        section.ChangePositiveOrNegative(positive);
+
     }
     #endregion
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerBullet
   m_EditorClassIdentifier: Assembly-CSharp::BulletSO
   BulletSpeed: 17
-  BulletDamage: 4
+  BulletDamage: 100
   BulletLifetime: 5
   BouncyBullet: 0
   BossBullet: 0
