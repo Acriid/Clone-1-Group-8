@@ -6350,7 +6350,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -6579,11 +6579,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 16
+  focusSpeed: 8
   dashSpeed: 8
   dashDuration: 0
   bulletManager: {fileID: 725986945}
   firePoint: {fileID: 1938243003}
   fireRate: 0.13333334
+  focusFOV: 50
+  normalFOV: 60
+  fovTransitionSpeed: 10
 --- !u!50 &725986942
 Rigidbody2D:
   serializedVersion: 5
@@ -6805,7 +6809,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -8621,7 +8625,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -8802,6 +8806,7 @@ GameObject:
   - component: {fileID: 1774554972}
   - component: {fileID: 1774554971}
   - component: {fileID: 1774554974}
+  - component: {fileID: 1774554975}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -8927,6 +8932,18 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1774554975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774554970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27fee8554ddf8504ab8099bbac0756df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Fullscreen
 --- !u!1 &1837401734
 GameObject:
   m_ObjectHideFlags: 0
@@ -8976,7 +8993,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
