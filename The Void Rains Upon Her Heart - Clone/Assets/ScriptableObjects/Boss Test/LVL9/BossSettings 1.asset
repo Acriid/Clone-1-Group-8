@@ -15,9 +15,9 @@ MonoBehaviour:
   BossLevel: 2
   ArenaPaddingPercentageX: 0.96
   ArenaPaddingPercentageY: 0.85
-  BossHealth: 1929
-  SectionHealthPhase1: 349
-  SectionHealthPhase2: 97
+  BossHealth: 3299
+  SectionHealthPhase1: 596
+  SectionHealthPhase2: 220
   SectionsParentRotationSpeed: 20
   BulletSectionRotationSpeed: 120
   AttackDelay: 2

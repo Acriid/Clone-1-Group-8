@@ -146,11 +146,6 @@ public class BossBrain : MonoBehaviour
             bossSection1.IndicateDestroyed();
         }
         _onAttackDone -= SendAttack;
-        if(_sectionsCore != null)
-        {
-            _sectionsCore.SetActive(true);
-            _sectionsCore.GetComponent<BossSection>().StartPhase2(Mathf.Infinity);   
-        }
         if(_bossLevel == 1)
         { 
             StartPhase2LVL2();
@@ -161,6 +156,7 @@ public class BossBrain : MonoBehaviour
             StartPhase2LVL9();
             _onAttackDone += SendPhase2LVL9Attack;
         }
+        
         StopAllCoroutines();
     }
     private void StartPhase2LVL9()
@@ -187,6 +183,12 @@ public class BossBrain : MonoBehaviour
         foreach(BossSection bossSection1 in _sectionList)
         {
             bossSection1.StartPhase2(_bossSettingsSO.SectionHealthPhase2);
+        }
+
+        if(_sectionsCore != null)
+        {
+            _sectionsCore.SetActive(true);
+            _sectionsCore.GetComponent<BossSection>().StartPhase2(Mathf.Infinity);   
         }
 
         StartPhase2LVL9Attacks();
@@ -400,6 +402,12 @@ public class BossBrain : MonoBehaviour
         foreach(BossSection bossSection1 in _sectionList)
         {
             bossSection1.StartPhase2(_bossSettingsSO.SectionHealthPhase2);
+        }
+
+        if(_sectionsCore != null)
+        {
+            _sectionsCore.SetActive(true);
+            _sectionsCore.GetComponent<BossSection>().StartPhase2(Mathf.Infinity);   
         }
 
         StartPhase2Attacks();
