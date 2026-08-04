@@ -1,6 +1,8 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BossHealthManager : MonoBehaviour
@@ -58,7 +60,7 @@ public class BossHealthManager : MonoBehaviour
     {
        //flash White
         //add shakes when health low
-        while (_HealthSlider.value!>= _currentHealth)
+        while (_HealthSlider.value >= _currentHealth)
         {
             _HealthSlider.value -= 1f;
             yield return new WaitForSeconds(0.05f);
@@ -69,21 +71,76 @@ public class BossHealthManager : MonoBehaviour
 
     IEnumerator HealthBarAnimationEnd()
     {
-        //_HealthSlider.value = _currentHealth;
-        yield return new WaitForSeconds(2f);
-        //add shakes when health low
-        while (_HealthSlider.value! <= _DamageSlider.value)
-        {
-            _DamageSlider.value -= 10f;
-            yield return new WaitForSeconds(0.05f);
+        CameraShake.Instance.MinorShake();
 
+        while (_DamageSlider.value > _HealthSlider.value)
+        {
+            _DamageSlider.value = Mathf.Max(
+                _HealthSlider.value,
+                _DamageSlider.value - 10f);
+
+            yield return new WaitForSeconds(0.05f);
         }
 
+        yield return new WaitForSeconds(0.05f);
+        StartCoroutine(WinAnimation());
     }
 
     private void BossDeath()
     {
         StartCoroutine(HealthBarAnimationEnd());
+       // StartCoroutine(WinAnimation());
+    }
+
+    [SerializeField] private SpriteRenderer _playerSprite;
+    [SerializeField] private Transform _playerTransform;
+    [SerializeField] private ParticleSystem _winParticles;
+    [SerializeField] private ParticleSystem _trailParticles;
+    [SerializeField] private PlayerController _playerController;
+    [SerializeField] private Rigidbody2D _rb;
+
+    [SerializeField] private float _flyDistance = 20f;
+    [SerializeField] private float _flyTime = 4f;
+
+    private IEnumerator WinAnimation()
+    {
+        // Disable player controls
+        //_playerController.enabled = false;
+
+        // Stop movement
+        _rb.linearVelocity = Vector2.zero;
+        _rb.angularVelocity = 0f;
+        _rb.simulated = false;
+
+        // Play victory burst
+        if (_winParticles != null)
+            _winParticles.Play();
+
+        yield return new WaitForSeconds(1f);
+
+        // Start trail
+        if (_trailParticles != null)
+            _trailParticles.Play();
+
+        Vector3 targetPosition =
+    _playerTransform.position + Vector3.right * _flyDistance;
+
+     
+
+        yield return _playerTransform
+            .DOMove(targetPosition, _flyTime)
+            .SetEase(Ease.InQuad)
+            .WaitForCompletion();
+
+        // Stop particles
+        if (_trailParticles != null)
+            _trailParticles.Stop();
+
+        // Hide player
+        _playerSprite.enabled = false;
+
+        // main menu scene
+        SceneManager.LoadScene(0);
     }
 
 }
