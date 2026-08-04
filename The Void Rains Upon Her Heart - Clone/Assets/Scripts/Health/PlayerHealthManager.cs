@@ -75,6 +75,7 @@ public class PlayerHealthManager : MonoBehaviour
     IEnumerator HealthBarAnimation()
     {
         _HealthSlider.value = _CurrentHealth;
+
         yield return new WaitForSeconds(2f);
         //add shakes when health low
         while (_HealthSlider.value !<= _DamageSlider.value) 
@@ -94,7 +95,7 @@ public class PlayerHealthManager : MonoBehaviour
 
         OnPlayerDeath?.Invoke();
 
-        CameraShake.Instance.MinorShake();
+        
 
         player.enabled = false;
 
