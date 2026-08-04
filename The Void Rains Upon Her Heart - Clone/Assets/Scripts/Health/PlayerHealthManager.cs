@@ -1,8 +1,9 @@
+using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Collections;
-using DG.Tweening;
 
 public class PlayerHealthManager : MonoBehaviour
 {
@@ -216,10 +217,10 @@ public class PlayerHealthManager : MonoBehaviour
         // Hide the pieces
         _topHeartHalf.gameObject.SetActive(false);
         _bottomHeartHalf.gameObject.SetActive(false);
-        
+
 
         //load main menu Scene
-        
+        SceneManager.LoadScene(0);
     }
 
 

@@ -10904,7 +10904,7 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
@@ -11025,7 +11025,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 20
+      scalar: 43.3
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -11520,7 +11520,7 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 6
     enabled: 1
-    type: 5
+    type: 15
     angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
@@ -11726,7 +11726,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 10
+      scalar: 100
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -11779,7 +11779,7 @@ ParticleSystem:
     rateOverDistance:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: 16.23
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -17818,8 +17818,8 @@ MonoBehaviour:
   _trailParticles: {fileID: 502654066}
   _playerController: {fileID: 725986941}
   _rb: {fileID: 725986942}
-  _flyDistance: 500
-  _flyTime: 7
+  _flyDistance: 100
+  _flyTime: 3
 --- !u!212 &1130661799
 SpriteRenderer:
   serializedVersion: 3
