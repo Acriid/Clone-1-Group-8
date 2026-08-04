@@ -48,7 +48,7 @@ public class PlayerHealthManager : MonoBehaviour
         if (IsInvulnerable) return;
         _CurrentHealth -= damage;
         _CurrentHealth = Mathf.Clamp(_CurrentHealth, 0, _MaxHealth); //makes sure current health doesnt fall below 0
-
+        CameraShake.Instance.MinorShake();
         // _HealthSlider.value = _CurrentHealth; // update UI
         //StartCoroutine(HealthBarAnimation());
 
@@ -90,6 +90,7 @@ public class PlayerHealthManager : MonoBehaviour
         Debug.Log("Player Died");
 
         OnPlayerDeath?.Invoke();
+        CameraShake.Instance.MinorShake();
 
         // Disable player controls
         // Play animation

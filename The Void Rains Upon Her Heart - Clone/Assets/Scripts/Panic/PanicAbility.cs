@@ -1,17 +1,20 @@
 using System.Collections;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class PanicAbility : MonoBehaviour
 {
     [Header("Panic Settings")]
     [SerializeField] private float _panicDuration = 2f;
     [SerializeField] private float _cooldown = 8f;
+    [SerializeField] private int _panicAmount = 2;
 
     [Header("References")]
     [SerializeField] private PlayerHealthManager _playerHealth;
     [SerializeField] private Transform _panicEffect;
     [SerializeField] private ParticleSystem _heartParticles;
+    [SerializeField] private TMP_Text _panicText;
 
     private CircleCollider2D _panicCollider;
     private Vector3 _originalScale;
@@ -45,11 +48,15 @@ public class PanicAbility : MonoBehaviour
         {
             _heartParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         }
+
+        //set max panic
+        _panicAmount = 2;
+        _panicText.text = _panicAmount.ToString();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && _canUse)
+        if (Input.GetKeyDown(KeyCode.Space) && _canUse && _panicAmount>0)
         {
             StartCoroutine(PanicRoutine());
         }
@@ -58,6 +65,11 @@ public class PanicAbility : MonoBehaviour
     private IEnumerator PanicRoutine()
     {
         _canUse = false;
+
+        // Minus one use
+
+        _panicAmount -= 1;
+        _panicText.text = _panicAmount.ToString();
 
         // Player cannot be damaged
         _playerHealth.IsInvulnerable = true;

@@ -9,6 +9,8 @@ public class Bullet : MonoBehaviour
     [SerializeField] private BulletSO _bulletSO = null;
     [SerializeField] private Rigidbody2D _bulletRigidBody = null;
 
+    public bool IsBossBullet => _bulletSO.BossBullet;
+
     private Coroutine _despawnRoutine = null;
     //Event that needs to get called to despawn the bullet
     public event Action<Bullet> OnBulletRemoved;
@@ -70,6 +72,8 @@ public class Bullet : MonoBehaviour
             Debug.LogWarning("Attempting to shoot a bullet that was already shot");
             return;
         }
+        _bulletRigidBody.linearVelocity = Vector2.zero;
+        _bulletRigidBody.angularVelocity = 0f;
 
         _despawnRoutine = StartCoroutine(DespawnBullet());
 
@@ -125,4 +129,19 @@ public class Bullet : MonoBehaviour
         StopCoroutine(_despawnRoutine);
         _despawnRoutine = null;
     }
+
+    public void Despawn()
+    {
+        // Stop the lifetime coroutine if it's still running
+        StopDespawnRoutine();
+
+        // Reset the Rigidbody before returning to the pool
+        _bulletRigidBody.linearVelocity = Vector2.zero;
+        _bulletRigidBody.angularVelocity = 0f;
+
+        // Return to the pool
+        OnBulletRemoved?.Invoke(this);
+    }
+
+
 }
