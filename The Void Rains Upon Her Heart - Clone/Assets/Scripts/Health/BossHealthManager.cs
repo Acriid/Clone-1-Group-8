@@ -2,6 +2,7 @@ using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BossHealthManager : MonoBehaviour
@@ -139,6 +140,7 @@ public class BossHealthManager : MonoBehaviour
         _playerSprite.enabled = false;
 
         // main menu scene
+        SceneManager.LoadScene(0);
     }
 
 }
