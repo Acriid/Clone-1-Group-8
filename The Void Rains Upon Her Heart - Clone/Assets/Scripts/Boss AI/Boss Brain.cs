@@ -354,7 +354,7 @@ public class BossBrain : MonoBehaviour
         bossSection.StopLaser();
     }
 
-    //Shared bookkeeping used by every "wait for all sections to finish moving" handler.
+    //Shared bookkeeping
     //Marks bossSection as finished, returns false until every section is finished,
     //then resets the tracking list and returns true.
     private bool AllSectionsFinishedMoving(BossSection bossSection)
@@ -374,7 +374,7 @@ public class BossBrain : MonoBehaviour
         return true;
     }
 
-    //Shared bookkeeping used by every "wait for all sections to finish their laser" handler.
+    //Shared bookkeeping
     //Marks bossSection as finished, returns false until every section is finished,
     //then resets the tracking list and returns true.
     private bool AllSectionsFinishedLaser(BossSection bossSection)
@@ -963,7 +963,7 @@ public class BossBrain : MonoBehaviour
 
             bossSection.transform.up = Vector2.left;
         }
-        ChangeSectionsColour(_section1,!positive);
+        ChangeSectionsColour(_section2,!positive);
 
     }
     private void CheckIfCanClosingLaserAttack(BossSection bossSection)
@@ -1019,9 +1019,10 @@ public class BossBrain : MonoBehaviour
 
         List<BossSection> _moveList = new(_sectionList);
         _moveList.Remove(_laserSection);
+        ChangeSectionsColour(_moveList,!positive);
         _moveList.Add(_laserSection);
 
-        ChangeSectionsColour(_moveList,!positive);
+        
         MoveSectionsToLaserLineStartPositions(CheckIfCanStartLaserLineBulletAttack,_moveList);
     }
     private void CheckIfCanStartLaserLineBulletAttack(BossSection bossSection)

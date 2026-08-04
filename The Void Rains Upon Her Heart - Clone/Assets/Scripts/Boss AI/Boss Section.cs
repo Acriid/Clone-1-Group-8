@@ -39,7 +39,7 @@ public class BossSection : MonoBehaviour
     private Coroutine _bulletRoutine = null;
     private Coroutine _rotateRoutine = null;
 
-    private bool _isPositive = true;
+    private bool _isPositive = false;
 
     private int _currentPhase = 1;
     #region Damage
