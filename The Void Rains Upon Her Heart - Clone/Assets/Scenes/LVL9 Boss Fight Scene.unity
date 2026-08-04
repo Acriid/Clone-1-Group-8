@@ -5395,13 +5395,13 @@ MonoBehaviour:
     m_Position: {x: -24, y: -15, z: 0}
     m_Size: {x: 48, y: 30, z: 0}
   _phase2LaserSOLVL2: {fileID: 11400000, guid: c48cb2e50dd9b4b45a1d6c47a4acfb1c, type: 2}
-  _phase2LaserSOLVL9: {fileID: 0}
+  _phase2LaserSOLVL9: {fileID: 11400000, guid: e3eb373079e7e43468ba13a8042191db, type: 2}
   _sectionsParent: {fileID: 1130661794}
   _sectionsCore: {fileID: 1888037751}
   _negativeSection: {fileID: 1869951671}
   _positiveSection: {fileID: 474397631}
-  _bossSettingsSO: {fileID: 11400000, guid: 833dfda0aa0703e49bffabf130b1dcd8, type: 2}
-  _lvl9BossSettingsSO: {fileID: 0}
+  _bossSettingsSO: {fileID: 11400000, guid: 59d1eb1d1043fe14a85bc07413a07eff, type: 2}
+  _lvl9BossSettingsSO: {fileID: 11400000, guid: aae258bc9562301478051ea955790d9a, type: 2}
   _sectionList:
   - {fileID: 1072440987}
   - {fileID: 1793218003}
@@ -10607,7 +10607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 5b9eedd061ccd514aa2a0b7d5ed1309b, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: 65ee53f12459a6e4e93447a7e0aef7b7, type: 3}
   _bulletPoolSize: 70
 --- !u!114 &474397631
 MonoBehaviour:
@@ -15981,7 +15981,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: f7ecf1e3ddb230548949fe181222ee0a, type: 3}
   _bulletPoolSize: 100
 --- !u!114 &632106698
 MonoBehaviour:
@@ -16078,7 +16078,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: c47db2c9db179624794ce132f8d0ee3f, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: 5a091cec8f3d6fd4f8591a6b6135d067, type: 3}
   _bulletPoolSize: 100
 --- !u!1 &643101466
 GameObject:
@@ -16758,7 +16758,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: f7ecf1e3ddb230548949fe181222ee0a, type: 3}
   _bulletPoolSize: 100
 --- !u!114 &772284344
 MonoBehaviour:
@@ -16855,7 +16855,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: c47db2c9db179624794ce132f8d0ee3f, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: 5a091cec8f3d6fd4f8591a6b6135d067, type: 3}
   _bulletPoolSize: 100
 --- !u!1 &802449661
 GameObject:
@@ -17476,7 +17476,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: f7ecf1e3ddb230548949fe181222ee0a, type: 3}
   _bulletPoolSize: 100
 --- !u!114 &1072440987
 MonoBehaviour:
@@ -17642,7 +17642,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: c47db2c9db179624794ce132f8d0ee3f, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: 5a091cec8f3d6fd4f8591a6b6135d067, type: 3}
   _bulletPoolSize: 100
 --- !u!1 &1082898063
 GameObject:
@@ -19477,7 +19477,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: 1007367393fd6604d9c8b5dd6967f2e1, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: f7ecf1e3ddb230548949fe181222ee0a, type: 3}
   _bulletPoolSize: 100
 --- !u!114 &1793218003
 MonoBehaviour:
@@ -19574,7 +19574,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: c47db2c9db179624794ce132f8d0ee3f, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: 5a091cec8f3d6fd4f8591a6b6135d067, type: 3}
   _bulletPoolSize: 100
 --- !u!1 &1837401734
 GameObject:
@@ -19760,7 +19760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12416af50efca1245a75d28cad056f30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletManager
-  _bullet: {fileID: 7338214740492402017, guid: ca772fc9d0343b64a893ca59753eb8a0, type: 3}
+  _bullet: {fileID: 7338214740492402017, guid: 519c980ddcc13d24780f16fa0a97a8bd, type: 3}
   _bulletPoolSize: 70
 --- !u!114 &1869951671
 MonoBehaviour:
