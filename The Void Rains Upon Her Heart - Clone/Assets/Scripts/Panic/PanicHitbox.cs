@@ -12,5 +12,20 @@ public class PanicHitbox : MonoBehaviour
         {
             section.Damage(_damage);
         }
+
+      
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (!other.gameObject.layer.Equals(LayerMask.NameToLayer("Bullet")))
+            return;
+
+        Bullet bullet = other.GetComponent<Bullet>();
+
+        if (bullet != null && bullet.IsBossBullet)
+        {
+            bullet.Despawn();
+        }
     }
 }
