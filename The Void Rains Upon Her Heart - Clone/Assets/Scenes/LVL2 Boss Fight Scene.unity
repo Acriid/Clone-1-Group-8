@@ -439,14 +439,14 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 92486351}
   serializedVersion: 8
-  lengthInSec: 5
+  lengthInSec: 2
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
@@ -514,7 +514,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 1
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -567,7 +567,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 7
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -11025,7 +11025,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 20
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -17813,12 +17813,13 @@ MonoBehaviour:
   _HealthSlider: {fileID: 2122112787}
   _DamageSlider: {fileID: 214471025}
   _playerSprite: {fileID: 725986943}
+  _playerTransform: {fileID: 725986944}
   _winParticles: {fileID: 92486354}
   _trailParticles: {fileID: 502654066}
   _playerController: {fileID: 725986941}
   _rb: {fileID: 725986942}
-  _flyDistance: 40
-  _flyTime: 1.5
+  _flyDistance: 500
+  _flyTime: 7
 --- !u!212 &1130661799
 SpriteRenderer:
   serializedVersion: 3

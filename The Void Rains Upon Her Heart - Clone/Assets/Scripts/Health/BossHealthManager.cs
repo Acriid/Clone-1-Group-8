@@ -70,18 +70,19 @@ public class BossHealthManager : MonoBehaviour
 
     IEnumerator HealthBarAnimationEnd()
     {
-        //_HealthSlider.value = _currentHealth;
-        yield return new WaitForSeconds(2f);
-        //add shakes when health low
-        while (_HealthSlider.value <= _DamageSlider.value)
+        CameraShake.Instance.MinorShake();
+
+        while (_DamageSlider.value > _HealthSlider.value)
         {
-            _DamageSlider.value -= 10f;
+            _DamageSlider.value = Mathf.Max(
+                _HealthSlider.value,
+                _DamageSlider.value - 10f);
+
             yield return new WaitForSeconds(0.05f);
-
         }
-        yield return new WaitForSeconds(1f);
-        StartCoroutine(WinAnimation());
 
+        yield return new WaitForSeconds(0.05f);
+        StartCoroutine(WinAnimation());
     }
 
     private void BossDeath()
@@ -91,6 +92,7 @@ public class BossHealthManager : MonoBehaviour
     }
 
     [SerializeField] private SpriteRenderer _playerSprite;
+    [SerializeField] private Transform _playerTransform;
     [SerializeField] private ParticleSystem _winParticles;
     [SerializeField] private ParticleSystem _trailParticles;
     [SerializeField] private PlayerController _playerController;
@@ -113,15 +115,18 @@ public class BossHealthManager : MonoBehaviour
         if (_winParticles != null)
             _winParticles.Play();
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
 
         // Start trail
         if (_trailParticles != null)
             _trailParticles.Play();
 
-        Vector3 targetPosition = transform.position + Vector3.right * _flyDistance;
+        Vector3 targetPosition =
+    _playerTransform.position + Vector3.right * _flyDistance;
 
-        yield return transform
+     
+
+        yield return _playerTransform
             .DOMove(targetPosition, _flyTime)
             .SetEase(Ease.InQuad)
             .WaitForCompletion();
